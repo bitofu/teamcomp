@@ -1,3 +1,18 @@
+## Getting Started
+```
+git clone https://github.com/CyberKronos/teamcomp.git
+
+cd teamcomp
+
+npm install
+// or
+yarn install
+
+npm start
+// or
+yarn start
+```
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
