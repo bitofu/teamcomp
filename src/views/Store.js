@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import firebase from 'firebase';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Card from 'grommet/components/Card';
@@ -18,41 +19,41 @@ import FormField from 'grommet/components/FormField';
 import Paragraph from 'grommet/components/Paragraph';
 import CheckBox from 'grommet/components/CheckBox';
 
-
-// Test data - will move to a db
-const userFunds = 1000;
-const packData = {
-  'onePack': {
-    price: 200,
-    quantity: 1
-  },
-  'fivePack': {
-    price: 500,
-    quantity: 5
-  },
-  'fifteenPack': {
-    price: 1500,
-    quantity: 15
-  },
-  'thirtyPack': {
-    price: 3000,
-    quantity: 30
-  },
-  'fiftyPack': {
-    price: 5000,
-    quantity: 50
-  }
-};
-
 class Store extends Component {
   constructor(props) {
     super(props);
     this.state = {
       confirmationPopup: false,
       packPrice: 0,
-      packQuantity: 0
+      packQuantity: 0,
+      packData: [],
+      userGold: 0,
+      unopenedPacks: 0
     };
     this._onClickBuy = this._onClickBuy.bind(this);
+  }
+
+  componentWillMount() {
+    // Get user data
+    let userDataRef = firebase.database().ref("users/alex");
+    userDataRef.on("value", function(dataSnapshot) {
+      let userGold = dataSnapshot.val().gold;
+      let unopenedPacks = dataSnapshot.val().unopenedPacks;
+      this.setState({
+        userGold: userGold,
+        unopenedPacks: unopenedPacks
+      });
+    }.bind(this));
+
+    // Get pack data
+    let packDataRef = firebase.database().ref("packData");
+    packDataRef.on("value", function(dataSnapshot) {
+      let packData = [];
+      packData = dataSnapshot.val();
+      this.setState({
+        packData: packData
+      });
+    }.bind(this));
   }
 
   _onClickBuy(packPrice, packQuantity) {
@@ -70,18 +71,24 @@ class Store extends Component {
 
   purchasePack(e, packPrice, packQuantity) {
     e.stopPropagation();
-    e.preventDefault();
+    // e.preventDefault();
+    const { userGold, unopenedPacks } = this.state;
 
-    // TODO: Do calcution and deduct from user funds
-    if (userFunds < packPrice) return;
-    let newUserFunds = userFunds - packPrice;
-    console.log(newUserFunds);
-    console.log(packPrice);
-    console.log(packQuantity);
+    // Do calcution and deduct from user funds
+    if (userGold < packPrice) return;
+    const newUserGold = userGold - packPrice;
 
-    // TODO: Update new user funds
+    // Add packQuantity to current unopenedPacks
+    const newUnopenedPacks = unopenedPacks + packQuantity;
 
-    // TODO: Add card packs to user collection
+    // Update new user funds and add card packs to user collection
+    var fbUpdate = {};
+    // Replace with logged in user
+    fbUpdate['/users/alex/gold'] = newUserGold;
+    fbUpdate['/users/alex/unopenedPacks'] = newUnopenedPacks;
+
+    // save all to firebase
+    firebase.database().ref().update(fbUpdate);
   }
 
   render() {
@@ -118,6 +125,7 @@ class Store extends Component {
         </Layer>
       : null;
 
+    const { packData, userGold } = this.state;
     const listPacks = Object.keys(packData).map((key) =>
       <Tile key={key}>
         <Card thumbnail='/img/carousel-1.png'
@@ -127,8 +135,8 @@ class Store extends Component {
           heading='Classic'
           label='League of Legends'
           link={
-            <Anchor disabled={ packData[key].price <= userFunds ? false : true }
-                   onClick={ packData[key].price <= userFunds ? this._onClickBuy.bind(this, packData[key].price, packData[key].quantity) : null }
+            <Anchor disabled={ packData[key].price <= userGold ? false : true }
+                   onClick={ packData[key].price <= userGold ? this._onClickBuy.bind(this, packData[key].price, packData[key].quantity) : null }
                    label={'Buy for ' + packData[key].price + 'g'}
                    icon={<MoneyIcon />} />
           }
