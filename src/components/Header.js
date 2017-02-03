@@ -63,7 +63,8 @@ class AppHeader extends Component {
                 animateIcon={true}
                 primary={false}
                 reverse={false}
-                disabled={false} />
+                disabled={false}
+                path="/packs" />
               <Anchor icon={<MoneyIcon />}
                 label={userGold}
                 animateIcon={true}
