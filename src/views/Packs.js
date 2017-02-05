@@ -17,32 +17,43 @@ class Packs extends Component {
     super(props);
     this.state = {
       unopenedPacks: 0,
-      allPlayerKeys: []
+      allPlayerKeys: [],
+      currentUid: null
     };
   }
 
   componentWillMount() {
-    // Get logged in user data - this is just testing
-    let userDataRef = firebase.database().ref("users");
-    userDataRef.once("value", function(dataSnapshot) {
-      let userData = dataSnapshot.val().alex;
-      this.setState({
-        unopenedPacks: userData.unopenedPacks
-      });
-    }.bind(this));
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in.
+        let currentUid = user.uid;
+        this.setState({
+          currentUid: currentUid
+        });
 
-    // Stores all player keys in state for pack generating
-    let playerDataRef = firebase.database().ref("players");
-    playerDataRef.once("value", function(dataSnapshot) {
-      let allPlayerKeys = [];
-      dataSnapshot.forEach(function(childSnapshot) {
-        let playerKey = childSnapshot.key;
-        allPlayerKeys.push(playerKey);
-      });
-      this.setState({
-        allPlayerKeys: allPlayerKeys
-      });
-    }.bind(this));
+        // Get logged in user data - this is just testing
+        let userDataRef = firebase.database().ref("users/" + currentUid);
+        userDataRef.once("value", function(dataSnapshot) {
+          let userData = dataSnapshot.val();
+          this.setState({
+            unopenedPacks: userData.unopenedPacks
+          });
+        }.bind(this));
+
+        // Stores all player keys in state for pack generating
+        let playerDataRef = firebase.database().ref("players");
+        playerDataRef.once("value", function(dataSnapshot) {
+          let allPlayerKeys = [];
+          dataSnapshot.forEach(function(childSnapshot) {
+            let playerKey = childSnapshot.key;
+            allPlayerKeys.push(playerKey);
+          });
+          this.setState({
+            allPlayerKeys: allPlayerKeys
+          });
+        }.bind(this));
+      }
+    });
   }
 
   generateRanCards(array) {
@@ -62,35 +73,24 @@ class Packs extends Component {
   }
 
   saveCardsToCollection(cardKeys, unopenedPacks) {
-    // Save new data to firebase - this is just for test, change to logged in user
-    let collectionRef = firebase.database().ref("users/alex/collection");
+    const { currentUid } = this.state;
+
+    let collectionRef = firebase.database().ref("users/" + currentUid + "/collection");
     return Promise.all(
-      cardKeys.map(id => {
-        return collectionRef.child(id).once('value')
+      cardKeys.map(playerKey => {
+        return collectionRef.child(playerKey).once('value')
         .then(snapshot => {
           let updates = {};
 
-          // If the card is not in collection, save per usual
-          if (snapshot.val() === null) {
-            const cardQuantity = 1;
+          let cardKey = firebase.database().ref("users/" + currentUid + "/collection").push().key;
 
-            updates['/users/alex/collection/' + id] = {
-              'id': id,
-              'quantity': cardQuantity
-            };
+          updates['/users/' + currentUid + '/collection/' + cardKey ] = {
+            'cardKey': cardKey,
+            'playerKey': playerKey,
+          };
 
-            firebase.database().ref().update(updates);
-          } else {
-            // Increase the quantity of the card by one and save
-            const cardQuantity = snapshot.val().quantity + 1;
+          firebase.database().ref().update(updates);
 
-            updates['/users/alex/collection/' + id] = {
-              'id': id,
-              'quantity': cardQuantity
-            };
-
-            firebase.database().ref().update(updates);
-          }
           return snapshot.val();
         })
       })
@@ -102,7 +102,7 @@ class Packs extends Component {
       // Decrease count of unopened packs by 1
       let newUnopenedPacks = unopenedPacks - 1;
 
-      updates['/users/alex/unopenedPacks'] = newUnopenedPacks;
+      updates['/users/' + currentUid + '/unopenedPacks'] = newUnopenedPacks;
 
       firebase.database().ref().update(updates);
 

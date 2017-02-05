@@ -24,23 +24,30 @@ class AppHeader extends Component {
   }
 
   componentWillMount() {
-    // Get logged in user data - this is just testing
-    let userDataRef = firebase.database().ref("users");
-    userDataRef.on("value", function(dataSnapshot) {
-      let userData = dataSnapshot.val().alex;
-      this.setState({
-        userGold: userData.gold,
-        userSilver: userData.silver,
-        unopenedPacks: userData.unopenedPacks
-      });
-    }.bind(this));
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in.
+        let currentUid = user.uid;
+
+        let userDataRef = firebase.database().ref("users/" + currentUid);
+        userDataRef.on("value", function(dataSnapshot) {
+          let userData = dataSnapshot.val();
+          this.setState({
+            userGold: userData.gold,
+            userSilver: userData.silver,
+            unopenedPacks: userData.unopenedPacks
+          });
+        }.bind(this));
+      }
+    });
   }
 
   render() {
     const { userGold, userSilver, unopenedPacks } = this.state;
     return (
       <Header justify="center" colorIndex="neutral-4">
-        <Box size={{width: {max: 'xxlarge'}}}
+        {/* <Box size={{width: {max: 'xxlarge'}}} */}
+        <Box
             direction="row"
             responsive={false}
             justify="start"

@@ -34,26 +34,33 @@ class Store extends Component {
   }
 
   componentWillMount() {
-    // Get user data
-    let userDataRef = firebase.database().ref("users/alex");
-    userDataRef.on("value", function(dataSnapshot) {
-      let userGold = dataSnapshot.val().gold;
-      let unopenedPacks = dataSnapshot.val().unopenedPacks;
-      this.setState({
-        userGold: userGold,
-        unopenedPacks: unopenedPacks
-      });
-    }.bind(this));
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in.
+        let currentUid = user.uid;
 
-    // Get pack data
-    let packDataRef = firebase.database().ref("packData");
-    packDataRef.on("value", function(dataSnapshot) {
-      let packData = [];
-      packData = dataSnapshot.val();
-      this.setState({
-        packData: packData
-      });
-    }.bind(this));
+        // Get user data
+        let userDataRef = firebase.database().ref("users/" + currentUid);
+        userDataRef.on("value", function(dataSnapshot) {
+          let userGold = dataSnapshot.val().gold;
+          let unopenedPacks = dataSnapshot.val().unopenedPacks;
+          this.setState({
+            userGold: userGold,
+            unopenedPacks: unopenedPacks
+          });
+        }.bind(this));
+
+        // Get pack data
+        let packDataRef = firebase.database().ref("packData");
+        packDataRef.on("value", function(dataSnapshot) {
+          let packData = [];
+          packData = dataSnapshot.val();
+          this.setState({
+            packData: packData
+          });
+        }.bind(this));
+      }
+    });
   }
 
   _onClickBuy(packPrice, packQuantity) {
@@ -126,6 +133,8 @@ class Store extends Component {
       : null;
 
     const { packData, userGold } = this.state;
+    console.log(packData);
+    console.log(userGold);
     const listPacks = Object.keys(packData).map((key) =>
       <Tile key={key}>
         <Card thumbnail='/img/carousel-1.png'
