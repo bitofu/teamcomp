@@ -1,69 +1,62 @@
 import React, { Component } from 'react';
-import Anchor from 'grommet/components/Anchor';
+import firebase from 'firebase';
 import Box from 'grommet/components/Box';
 import Card from 'grommet/components/Card';
-import Columns from 'grommet/components/Columns';
 import Heading from 'grommet/components/Heading';
-import SocialTwitterIcon from 'grommet/components/icons/base/SocialTwitter';
+import Tile from 'grommet/components/Tile';
+import Tiles from 'grommet/components/Tiles';
 import LinkNextIcon from 'grommet/components/icons/base/LinkNext';
 import NavAnchor from './NavAnchor';
 
-const grommetPath = 'http://grommet.github.io';
-
 export default class RegularLeagues extends Component {
-  _onClickCard(path, event) {
-    event.preventDefault();
-    window.location.href = path;
+  constructor(props) {
+    super(props);
+    this.state = {
+      leagues: [],
+    };
+  }
+
+  componentWillMount() {
+    let leaguesRef = firebase.database().ref("leagues").orderByChild("leagueType").equalTo("regular");
+    leaguesRef.once("value", function(dataSnapshot) {
+      let leagues = [];
+      dataSnapshot.forEach(function(childSnapshot) {
+        let leagueData = childSnapshot.val();
+        leagues.push(leagueData);
+      });
+      this.setState({
+        leagues: leagues
+      });
+    }.bind(this));
   }
 
   render() {
-    const twitterIconBox = (
-      <Box align="end">
-        <SocialTwitterIcon />
-      </Box>
-    );
-
-    const socialFeedCard1 = (
-      <Card
-        colorIndex="light-1"
-        margin="small"
-        contentPad="medium"
-        onClick={this._onClickCard.bind(this, 'http://www.twitter.com')}
-        direction="column"
-        label="Social">
-        <Heading tag="h2">
-          Protect Your Digital Enterprise ipsum lorem dolores aeat el
-        </Heading>
-        {twitterIconBox}
-      </Card>
-    );
-
-    const featuredPostCard = (
-      <Card
-        colorIndex="light-1"
-        margin="small"
-        contentPad="medium"
-        onClick={this._onClickCard.bind(this, '/league/1234')}
-        direction="column"
-        label="NA LCS"
-        link={
-          <NavAnchor path="/league/1234" label="Enter"
-            icon={<LinkNextIcon />} />
-        }>
-        <Heading tag="h2">
-          Standard weekly draft for NA LCS
-        </Heading>
-      </Card>
+    const { leagues } = this.state;
+    const listLeagues = leagues.map((league) =>
+      <Tile key={league.leagueKey} >
+        <Card
+          margin="small"
+          contentPad="large"
+          direction="column"
+          label={ "Type: " + league.gameType }
+          link={
+            <NavAnchor path={"/league/" + league.leagueKey } label="Enter"
+              icon={<LinkNextIcon />} />
+          }>
+          <Heading tag="h2">
+            { league.title }
+          </Heading>
+        </Card>
+      </Tile>
     );
 
     return (
-      <Box className="columns-container"
-        pad={{horizontal: "large"}} full="horizontal">
-        <Columns size="medium" justify="center" masonry={true}
-          maxCount={3} responsive={true}>
-          {featuredPostCard}
-          {featuredPostCard}
-        </Columns>
+      <Box>
+        <Tiles selectable={false}
+          fill={true}
+          flush={false} >
+          { listLeagues }
+        </Tiles>
       </Box>
     );
   }

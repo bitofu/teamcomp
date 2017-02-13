@@ -13,6 +13,10 @@ npm start
 yarn start
 ```
 
+## TODO:
+- Add redux to app
+- Refactor components (it is becoming to messy already)
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>

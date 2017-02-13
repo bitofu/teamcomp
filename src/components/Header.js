@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 import firebase from 'firebase';
-import { Link } from 'react-router'
 import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
 import Header from 'grommet/components/Header';
 import Menu from 'grommet/components/Menu';
 import GrommetIcon from 'grommet/components/icons/base/BrandGrommetOutline';
 import MoneyIcon from 'grommet/components/icons/base/Money';
-import CurrencyIcon from 'grommet/components/icons/base/Currency';
+import SettingsOptionIcon from 'grommet/components/icons/base/SettingsOption';
 import MultipleIcon from 'grommet/components/icons/base/Multiple';
-import Edit from 'grommet/components/icons/base/Edit';
-import SearchIcon from 'grommet/components/icons/base/Search';
 import NavAnchor from './NavAnchor';
 
 class AppHeader extends Component {
@@ -21,6 +18,7 @@ class AppHeader extends Component {
       userSilver: 0,
       unopenedPacks: 0
     };
+    this._logout = this._logout.bind(this);
   }
 
   componentWillMount() {
@@ -42,11 +40,21 @@ class AppHeader extends Component {
     });
   }
 
+  _logout(e) {
+    e.stopPropagation();
+    firebase.auth().signOut().then(function() {
+      // Sign-out successful.
+      console.log('Sign-out successful');
+    }, function(error) {
+      // An error happened.
+      console.log('Error logging out');
+    });
+  }
+
   render() {
-    const { userGold, userSilver, unopenedPacks } = this.state;
+    const { userGold, unopenedPacks } = this.state;
     return (
-      <Header justify="center" colorIndex="neutral-4">
-        {/* <Box size={{width: {max: 'xxlarge'}}} */}
+      <Header justify="center" colorIndex="grey-1">
         <Box
             direction="row"
             responsive={false}
@@ -54,36 +62,58 @@ class AppHeader extends Component {
             align="center"
             pad={{horizontal: 'medium'}}
             flex="grow">
-          <GrommetIcon colorIndex="brand" size="large" />
+          <GrommetIcon className="brand-logo" size="large" />
           <Box pad="small" />
-          <Menu label="Label" inline={true} direction="row" flex="grow">
+          <Menu label="Menu" inline={true} direction="row" flex="grow">
             <NavAnchor path="/lobby">Lobby</NavAnchor>
+            <NavAnchor path="/myleagues">My Leagues</NavAnchor>
             <NavAnchor path="/collection">Collection</NavAnchor>
-            <NavAnchor path="/schedules">Schedules</NavAnchor>
+            {/* <NavAnchor path="/schedules">Schedules</NavAnchor> */}
             <NavAnchor path="/store">Store</NavAnchor>
+            <NavAnchor path="/howtoplay">How To Play</NavAnchor>
           </Menu>
 
           <Box flex="grow" align="end">
-            <Menu label="Label" inline={true} direction="row" flex="grow">
-              <Anchor icon={<MultipleIcon />}
-                label={unopenedPacks}
+            <Menu label="Profile" inline={true} direction="row" flex="grow">
+              <div>
+                <Anchor icon={<MultipleIcon />}
+                  label={"My Packs (" + unopenedPacks + ")"}
+                  animateIcon={true}
+                  primary={false}
+                  reverse={false}
+                  disabled={false}
+                  path="/packs" />
+              </div>
+              <div>
+                <Anchor icon={<MoneyIcon className="gold-icon" />}
+                  className="gold-icon"
+                  label={userGold + " Gold"}
+                  animateIcon={true}
+                  primary={false}
+                  reverse={false}
+                  disabled={false} />
+              </div>
+              <Menu responsive={true}
+                icon={<SettingsOptionIcon />}
+                size='small'
+                closeOnClick={true}>
+                <Anchor href='#' className="teamcomp-blue">
+                  Profile
+                </Anchor>
+                <Anchor href='#' className="teamcomp-blue">
+                  Change Password
+                </Anchor>
+                <Anchor className="teamcomp-blue"
+                        onClick={(e) => this._logout(e)}>
+                  Logout
+                </Anchor>
+              </Menu>
+              {/* <Anchor icon={<CurrencyIcon />}
+                label={userSilver + " Silver"}
                 animateIcon={true}
                 primary={false}
                 reverse={false}
-                disabled={false}
-                path="/packs" />
-              <Anchor icon={<MoneyIcon />}
-                label={userGold}
-                animateIcon={true}
-                primary={false}
-                reverse={false}
-                disabled={false} />
-              <Anchor icon={<CurrencyIcon />}
-                label={userSilver}
-                animateIcon={true}
-                primary={false}
-                reverse={false}
-                disabled={false} />
+                disabled={false} /> */}
             </Menu>
           </Box>
         </Box>

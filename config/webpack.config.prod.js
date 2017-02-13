@@ -153,7 +153,11 @@ module.exports = {
 
   sassLoader: {
     includePaths: [
-      './node_modules'
+      './node_modules',
+      // this is required only for NPM < 3.
+      // Dependencies are flat in NPM 3+ so pointing to
+      // the internal grommet/node_modules folder is not needed
+      './node_modules/grommet/node_modules'
     ]
   },
 

@@ -5,9 +5,7 @@ import Tile from 'grommet/components/Tile';
 import Card from 'grommet/components/Card';
 import Box from 'grommet/components/Box';
 import Heading from 'grommet/components/Heading';
-import LinkNextIcon from 'grommet/components/icons/base/LinkNext';
 import Anchor from 'grommet/components/Anchor';
-import SocialTwitterIcon from 'grommet/components/icons/base/SocialTwitter';
 import MoneyIcon from 'grommet/components/icons/base/Money';
 import Layer from 'grommet/components/Layer';
 import Form from 'grommet/components/Form';
@@ -15,9 +13,7 @@ import Header from 'grommet/components/Header';
 import Footer from 'grommet/components/Footer';
 import Button from 'grommet/components/Button';
 import FormFields from 'grommet/components/FormFields';
-import FormField from 'grommet/components/FormField';
 import Paragraph from 'grommet/components/Paragraph';
-import CheckBox from 'grommet/components/CheckBox';
 
 class Store extends Component {
   constructor(props) {
@@ -28,7 +24,8 @@ class Store extends Component {
       packQuantity: 0,
       packData: [],
       userGold: 0,
-      unopenedPacks: 0
+      unopenedPacks: 0,
+      currentUid: null
     };
     this._onClickBuy = this._onClickBuy.bind(this);
   }
@@ -38,6 +35,9 @@ class Store extends Component {
       if (user) {
         // User is signed in.
         let currentUid = user.uid;
+        this.setState({
+          currentUid: currentUid
+        });
 
         // Get user data
         let userDataRef = firebase.database().ref("users/" + currentUid);
@@ -79,7 +79,7 @@ class Store extends Component {
   purchasePack(e, packPrice, packQuantity) {
     e.stopPropagation();
     // e.preventDefault();
-    const { userGold, unopenedPacks } = this.state;
+    const { userGold, unopenedPacks, currentUid } = this.state;
 
     // Do calcution and deduct from user funds
     if (userGold < packPrice) return;
@@ -91,8 +91,8 @@ class Store extends Component {
     // Update new user funds and add card packs to user collection
     var fbUpdate = {};
     // Replace with logged in user
-    fbUpdate['/users/alex/gold'] = newUserGold;
-    fbUpdate['/users/alex/unopenedPacks'] = newUnopenedPacks;
+    fbUpdate['/users/' + currentUid + '/gold'] = newUserGold;
+    fbUpdate['/users/' + currentUid + '/unopenedPacks'] = newUnopenedPacks;
 
     // save all to firebase
     firebase.database().ref().update(fbUpdate);
@@ -137,11 +137,12 @@ class Store extends Component {
     console.log(userGold);
     const listPacks = Object.keys(packData).map((key) =>
       <Tile key={key}>
-        <Card thumbnail='/img/carousel-1.png'
+        <Card thumbnail='https://firebasestorage.googleapis.com/v0/b/teamcomp-fecc4.appspot.com/o/packs%2Fleagueoflegends.jpg?alt=media'
+          className="card-pack"
           margin="small"
-          contentPad="small"
+          contentPad="large"
           direction="column"
-          heading='Classic'
+          heading={packData[key].quantity + ' Classic Pack'}
           label='League of Legends'
           link={
             <Anchor disabled={ packData[key].price <= userGold ? false : true }
@@ -149,15 +150,15 @@ class Store extends Component {
                    label={'Buy for ' + packData[key].price + 'g'}
                    icon={<MoneyIcon />} />
           }
-          description={packData[key].quantity + ' Classic Pack'} />
+          description={packData[key].quantity * 5 + ' Cards'} />
       </Tile>
     );
 
     return (
-      <Box>
+      <Box full={true} colorIndex="light-2">
         { confirmationPopup }
-        <Tiles selectable={true}
-          fill={false}
+        <Tiles selectable={false}
+          fill={true}
           flush={false}>
           { listPacks }
         </Tiles>

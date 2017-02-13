@@ -5,6 +5,7 @@ import Box from 'grommet/components/Box';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Card from 'grommet/components/Card';
+import Headline from 'grommet/components/Headline';
 
 // use this for animation transitions
 // import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
@@ -17,7 +18,7 @@ class Packs extends Component {
     super(props);
     this.state = {
       unopenedPacks: 0,
-      allPlayerKeys: [],
+      allPlayerKeysAndRegions: [],
       currentUid: null
     };
   }
@@ -43,13 +44,20 @@ class Packs extends Component {
         // Stores all player keys in state for pack generating
         let playerDataRef = firebase.database().ref("players");
         playerDataRef.once("value", function(dataSnapshot) {
-          let allPlayerKeys = [];
+          let allPlayerKeysAndRegions = [];
           dataSnapshot.forEach(function(childSnapshot) {
             let playerKey = childSnapshot.key;
-            allPlayerKeys.push(playerKey);
+            let playerRegion = childSnapshot.val().League;
+
+            let playerKeysAndRegions = {
+              playerKey: playerKey,
+              playerRegion: playerRegion
+            };
+
+            allPlayerKeysAndRegions.push(playerKeysAndRegions);
           });
           this.setState({
-            allPlayerKeys: allPlayerKeys
+            allPlayerKeysAndRegions: allPlayerKeysAndRegions
           });
         }.bind(this));
       }
@@ -68,34 +76,36 @@ class Packs extends Component {
       array[currentIndex] = array[randomIndex];
       array[randomIndex] = temporaryValue;
     }
-    let cardKeys = array.slice(0, 5);
-    return cardKeys;
+    let cardObjs = array.slice(0, 5);
+    return cardObjs;
   }
 
-  saveCardsToCollection(cardKeys, unopenedPacks) {
+  saveCardsToCollection(cardObjs, unopenedPacks) {
     const { currentUid } = this.state;
 
-    let collectionRef = firebase.database().ref("users/" + currentUid + "/collection");
     return Promise.all(
-      cardKeys.map(playerKey => {
-        return collectionRef.child(playerKey).once('value')
-        .then(snapshot => {
-          let updates = {};
+      cardObjs.map(playerObj => {
+        let playerKey = playerObj.playerKey;
+        let playerRegion = playerObj.playerRegion;
 
-          let cardKey = firebase.database().ref("users/" + currentUid + "/collection").push().key;
+        let updates = {};
 
-          updates['/users/' + currentUid + '/collection/' + cardKey ] = {
-            'cardKey': cardKey,
-            'playerKey': playerKey,
-          };
+        let cardKey = firebase.database().ref("users/" + currentUid + "/collection").push().key;
 
-          firebase.database().ref().update(updates);
+        let updateObj = {
+          'cardKey': cardKey,
+          'playerKey': playerKey,
+          'playerRegion': playerRegion
+        };
 
-          return snapshot.val();
-        })
+        updates['/users/' + currentUid + '/collection/' + cardKey ] = updateObj
+
+        firebase.database().ref().update(updates);
+
+        return updateObj;
       })
-    ).then(res => {
-      console.log(res);
+    ).then(packData => {
+      console.log(packData);
 
       let updates = {};
 
@@ -106,15 +116,17 @@ class Packs extends Component {
 
       firebase.database().ref().update(updates);
 
-      return 'Success';
+      return packData;
     });
   }
 
-  queryCardObjects(cardIds) {
+  queryCardObjects(packData) {
     let db = firebase.database().ref("players");
     return Promise.all(
-      cardIds.map(id => {
-        return db.child(id).once('value')
+      packData.map(player => {
+        let playerKey = player.playerKey;
+        console.log(playerKey);
+        return db.child(playerKey).once('value')
         .then(snapshot => {
           return snapshot.val();
         })
@@ -127,13 +139,13 @@ class Packs extends Component {
   _onClickPack(id, event) {
     event.preventDefault();
 
-    const { allPlayerKeys, unopenedPacks } = this.state;
+    const { allPlayerKeysAndRegions, unopenedPacks } = this.state;
     // Generate 5 cards for the pack
-    let cardKeys = this.generateRanCards(allPlayerKeys);
+    let cardObjs = this.generateRanCards(allPlayerKeysAndRegions);
     // Save cards to collection
-    this.saveCardsToCollection(cardKeys, unopenedPacks).then(res => {
+    this.saveCardsToCollection(cardObjs, unopenedPacks).then(packData => {
       // Query card data to send as props to next view
-      this.queryCardObjects(cardKeys).then(cardData => {
+      this.queryCardObjects(packData).then(cardData => {
         console.log(cardData);
         // Using hack-y temp solution to save cardData into localstorage, so that the pack opening view can retrieve
         localStorage.setItem('cardsInPack', JSON.stringify(cardData));
@@ -149,27 +161,39 @@ class Packs extends Component {
       listPacks.push(
         (
           <Tile key={i}
-                colorIndex="light-1"
                 onClick={this._onClickPack.bind(this, i)} >
-            <Card thumbnail='/img/carousel-1.png'
+            <Card thumbnail='https://firebasestorage.googleapis.com/v0/b/teamcomp-fecc4.appspot.com/o/packs%2Fleagueoflegends.jpg?alt=media'
+              className="card-pack"
+              margin="small"
+              contentPad="large"
               direction="column"
-              heading='Classic'
+              heading='Classic Pack'
               label='League of Legends'
-              description='Classic Pack' />
+              description='5 Cards' />
           </Tile>
         )
       );
     }
-
-    return (
-      <Box colorIndex="light-2">
-        <Tiles selectable={true}
-          fill={false}
-          flush={false} >
-          { listPacks }
-        </Tiles>
-      </Box>
-    );
+    if (unopenedPacks === 0) {
+      return (
+        <Box justify="center" align="center" full={true}>
+          <Headline strong={false}
+            size='medium'>
+            You have no unopened packs
+          </Headline>
+        </Box>
+      );
+    } else {
+      return (
+        <Box full={true} colorIndex="light-2">
+          <Tiles selectable={false}
+            fill={true}
+            flush={false} >
+            { listPacks }
+          </Tiles>
+        </Box>
+      );
+    }
   }
 }
 

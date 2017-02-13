@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Box from 'grommet/components/Box';
 import Headline from 'grommet/components/Headline';
 
-class Schedules extends Component {
+class HowToPlay extends Component {
   render() {
     return (
       <Box justify="center"
@@ -18,4 +18,4 @@ class Schedules extends Component {
   }
 }
 
-export default Schedules;
+export default HowToPlay;

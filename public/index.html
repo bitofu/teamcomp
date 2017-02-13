@@ -5,6 +5,244 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     <link rel="stylesheet" type="text/css" href="%PUBLIC_URL%/index.css">
+    <style>
+      /* COLOR SCHEME */
+      .brand-logo {
+        fill: #0095FF !important;
+      }
+
+      .gold-icon {
+        color: #E0BA22 !important;
+        stroke: #E0BA22 !important;
+      }
+
+      .teamcomp-blue {
+        color: #0095FF !important;
+      }
+
+      .teamcomp-gold {
+        color: #E0BA22 !important;
+      }
+
+      .button {
+        background-color: #0095FF;
+        border-color: #0095FF !important;
+      }
+
+      /* CARD PACKS*/
+      .card-pack {
+        border: 4px solid #000000;
+        border-radius: 10px;
+      }
+
+      /* PLAYER CARDS */
+      .tile-fix {
+        overflow: visible !important;
+        color: #F9F9F9;
+      }
+
+      .tile-grey-out {
+        opacity: 0.2;
+      }
+
+      .card-container {
+        /* How pronounced should the 3D effects be */
+        perspective: 500;
+        -webkit-perspective: 500;
+        -moz-perspective: 500;
+        -ms-perspective: 500;
+        -o-perspective: 500;
+      }
+
+      .card-front {
+        /* Enable 3D transforms */
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+        -moz-transform-style: preserve-3d;
+        -ms-transform-style: preserve-3d;
+        -o-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+         backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        -moz-backface-visibility: hidden;
+        -ms-backface-visibility: hidden;
+        -o-backface-visibility: hidden;
+
+        /* Animate the transitions */
+        -webkit-transition:0.8s; text-align:center;
+        -moz-transition:0.8s; text-align:center;
+        -ms-transition:0.8s; text-align:center;
+        -o-transition:0.8s; text-align:center;
+        transition:0.8s; text-align:center;
+
+        width:100%;
+    		height:100%;
+    		position:absolute;
+
+        /* The back side is flipped 180 deg by default */
+        transform:rotateY(180deg);
+        -webkit-transform:rotateY(180deg);
+        -moz-transform:rotateY(180deg);
+        -ms-transform:rotateY(180deg);
+        -o-transform:rotateY(180deg);
+      }
+
+      .card-back {
+        /* Enable 3D transforms */
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+        -moz-transform-style: preserve-3d;
+        -ms-transform-style: preserve-3d;
+        -o-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+         backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        -moz-backface-visibility: hidden;
+        -ms-backface-visibility: hidden;
+        -o-backface-visibility: hidden;
+
+        /* Animate the transitions */
+        -webkit-transition:0.8s; text-align:center;
+        -moz-transition:0.8s; text-align:center;
+        -ms-transition:0.8s; text-align:center;
+        -o-transition:0.8s; text-align:center;
+        transition:0.8s; text-align:center;
+      }
+
+      .front-flip {
+        /* .. at the same time flip the back side into visibility */
+        transform:rotateY(360deg);
+        -webkit-transform:rotateY(360deg);
+        -moz-transform:rotateY(360deg);
+        -ms-transform:rotateY(360deg);
+        -o-transform:rotateY(360deg);
+      }
+
+      .back-flip {
+        /* When the container is hovered, flip the front side and hide it .. */
+        transform:rotateY(180deg);
+        -webkit-transform:rotateY(180deg);
+        -moz-transform:rotateY(180deg);
+        -ms-transform:rotateY(180deg);
+        -o-transform:rotateY(180deg);
+      }
+
+      .player-tile {
+        background-image: linear-gradient(right, #000 11%, #222 56%);
+        background-image: -o-linear-gradient(right, #000 11%, #222 56%);
+        background-image: -moz-linear-gradient(right, #000 11%, #222 56%);
+        background-image: -webkit-linear-gradient(right, #000 11%, #222 56%);
+        background-image: -ms-linear-gradient(right, #000 11%, #222 56%);
+        background-image: gradient(right, #000 11%, #222 56%);
+        border-radius: 10px;
+        padding: 8px;
+        width: 350px;
+        height: 550px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+      }
+
+      .team-logo {
+        margin: auto;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: auto;
+        opacity: 0.1;
+      }
+
+      .player-card {
+        border: 4px solid #F9F9F9;
+        border-radius: 10px;
+        width: 98%;
+        height: 98%;
+        justify-content: center;
+        z-index: 100;
+      }
+
+      .player-name-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      .player-name {
+        text-align: left;
+        background-color: #F9F9F9;
+        border-top-left-radius: 5px;
+        border-bottom-right-radius: 10px;
+        padding: 10px;
+        color: #000000;
+        font-size: 24px;
+        font-weight: 500;
+        text-transform: uppercase;
+        width: 90%;
+      }
+
+      .player-position {
+        font-size: 14px;
+      }
+
+      .player-tier {
+        padding: 10px;
+        width: auto;
+      }
+
+      .player-img-container {
+        width: 100%;
+        text-align: center;
+        padding: 4px;
+      }
+
+      .player-img {
+        width: 75%;
+        /*border-radius: 50%;*/
+      }
+
+      .player-stats-list {
+        padding: 14px;
+      }
+
+      .player-stats-info {
+        text-align: center;
+      }
+
+      .player-stats {
+        font-size: 18px;
+        font-weight: 500;
+        padding-top: 16px;
+        padding-bottom: 16px;
+        border-top: 2px solid #F9F9F9;
+        border-bottom: 2px solid #F9F9F9;
+        border-color: #F9F9F9 !important;
+      }
+
+      .player-stats:first-child {
+        border-bottom: none;
+      }
+
+      .player-stats:nth-last-child(2) {
+        border-top: none;
+      }
+
+      .player-stats:last-child {
+        border-top: none;
+        border-bottom: none;
+      }
+
+      .info-button {
+        text-align: right;
+        padding: 8px 0 0 0;
+      }
+    </style>
     <!-- Enable bottom links when using react-slick -->
     <!-- <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css" /> -->

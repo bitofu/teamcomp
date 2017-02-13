@@ -11,6 +11,8 @@ import Store from './views/Store';
 import League from './views/League';
 import Packs from './views/Packs';
 import Openpack from './views/Openpack';
+import MyLeagues from './views/MyLeagues';
+import HowToPlay from './views/HowToPlay';
 
 import 'grommet/scss/vanilla/index.scss';
 
@@ -22,10 +24,7 @@ const config = {
   storageBucket: "teamcomp-fecc4.appspot.com"
 };
 
-const fb = firebase
-  .initializeApp(config)
-  .database()
-  .ref();
+firebase.initializeApp(config).database().ref();
 
 function requireAuth(nextState, replace) {
   firebase.auth().onAuthStateChanged((user) => {
@@ -34,7 +33,8 @@ function requireAuth(nextState, replace) {
       console.log(user);
     } else {
       // No user is signed in.
-      replace({
+      console.log('No user is signed in.');
+      browserHistory.replace({
         pathname: '/login'
       });
     }
@@ -50,11 +50,13 @@ ReactDOM.render((
       <Route path="lobby" component={Lobby} onEnter={requireAuth} />
       <Route path="login" component={Login} />
       <Route path="league/:leagueKey" component={League} onEnter={requireAuth} />
+      <Route path="myleagues" component={MyLeagues} onEnter={requireAuth} />
       <Route path="collection" component={Collection} onEnter={requireAuth} />
       <Route path="schedules" component={Schedules} onEnter={requireAuth} />
       <Route path="store" component={Store} onEnter={requireAuth} />
       <Route path="packs" component={Packs} onEnter={requireAuth} />
       <Route path="openpack/:packKey" component={Openpack} onEnter={requireAuth} />
+      <Route path="howtoplay" component={HowToPlay} onEnter={requireAuth} />
       {/* <Route path="about" component={About} /> */}
       {/* <Route path="*" component={NoMatch}/> */}
     </Route>
