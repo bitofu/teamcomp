@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import firebase from 'firebase';
+import { getLeagues } from '../actions/Leagues';
 import Box from 'grommet/components/Box';
 import Card from 'grommet/components/Card';
 import Heading from 'grommet/components/Heading';
@@ -17,17 +17,11 @@ export default class RegularLeagues extends Component {
   }
 
   componentWillMount() {
-    let leaguesRef = firebase.database().ref("leagues").orderByChild("leagueType").equalTo("regular");
-    leaguesRef.once("value", function(dataSnapshot) {
-      let leagues = [];
-      dataSnapshot.forEach(function(childSnapshot) {
-        let leagueData = childSnapshot.val();
-        leagues.push(leagueData);
-      });
+    getLeagues('regular', (leagues) => {
       this.setState({
         leagues: leagues
       });
-    }.bind(this));
+    });
   }
 
   render() {

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import firebase from 'firebase';
+import { logout } from '../actions/Auth';
+import { getUserPacksAndCurrency } from '../actions/User';
 import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
 import Header from 'grommet/components/Header';
@@ -22,33 +23,18 @@ class AppHeader extends Component {
   }
 
   componentWillMount() {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in.
-        let currentUid = user.uid;
-
-        let userDataRef = firebase.database().ref("users/" + currentUid);
-        userDataRef.on("value", function(dataSnapshot) {
-          let userData = dataSnapshot.val();
-          this.setState({
-            userGold: userData.gold,
-            userSilver: userData.silver,
-            unopenedPacks: userData.unopenedPacks
-          });
-        }.bind(this));
-      }
+    getUserPacksAndCurrency((userData) => {
+      this.setState({
+        userGold: userData.gold,
+        userSilver: userData.silver,
+        unopenedPacks: userData.unopenedPacks
+      });
     });
   }
 
   _logout(e) {
     e.stopPropagation();
-    firebase.auth().signOut().then(function() {
-      // Sign-out successful.
-      console.log('Sign-out successful');
-    }, function(error) {
-      // An error happened.
-      console.log('Error logging out');
-    });
+    logout();
   }
 
   render() {

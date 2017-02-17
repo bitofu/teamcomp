@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
+import { isUserInLeague, getUserLeagueDraft } from '../actions/User';
+import { getLeagueData } from '../actions/Leagues';
 import firebase from 'firebase';
 import Box from 'grommet/components/Box';
 import List from 'grommet/components/List';
@@ -36,8 +38,8 @@ class League extends Component {
       salaryCap: 0,
       isViewReady: false,
       confirmationPopup: false,
-      isUserLockedIn: false,
-      userDraft: null,
+      isUserInLeague: false,
+      userLeagueDraft: null,
 
       top: null,
       mid: null,
@@ -52,95 +54,101 @@ class League extends Component {
   }
 
   componentWillMount() {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in.
-        let currentUid = user.uid;
-        // Get league key
-        const leagueKey = this.props.params.leagueKey;
+    // Get league key
+    const leagueKey = this.props.params.leagueKey;
 
-        // Check if user is already locked in the league
-        let userRef = firebase.database().ref("users/"+ currentUid + "/leagues");
-        userRef.once("value").then((snapshot) => {
-          let isUserLockedIn = snapshot.child(leagueKey).exists();
+    isUserInLeague(leagueKey, (userInLeague) => {
+      if (userInLeague) {
+        getUserLeagueDraft(leagueKey, (userLeagueDraft) => {
           this.setState({
-            isUserLockedIn: isUserLockedIn
+            userLeagueDraft: userLeagueDraft
           });
-
-          if (isUserLockedIn) {
-            userRef.child(leagueKey).once("value", (dataSnapshot) => {
-              this.setState({
-                userDraft: dataSnapshot.val()
-              });
-            });
-          }
-        });
-
-        // Set league data
-        let leaguesRef = firebase.database().ref("leagues/" + leagueKey);
-        leaguesRef.once("value", (dataSnapshot) => {
-          let leagueData = dataSnapshot.val();
-          let leagueRegion = dataSnapshot.val().leagueRegion;
-
-          this.setState({
-            leagueData: leagueData,
-            salaryCap: leagueData.salaryCap
-          });
-
-          // Get and set user collection data
-          let collectionRef;
-          if (leagueRegion.length === 1) {
-            if (leagueRegion === "All") {
-              collectionRef = firebase.database().ref("users/" + currentUid + "/collection");
-            } else {
-              collectionRef = firebase.database().ref("users/" + currentUid + "/collection").orderByChild("playerRegion").equalTo(leagueRegion);
-            }
-            collectionRef.once("value", (dataSnapshot) => {
-              let collection = [];
-
-              dataSnapshot.forEach(function(childSnapshot) {
-                let collectionData = childSnapshot.val();
-                collection.push(collectionData);
-              });
-
-              // let filteredAvailableCollection = collection.filter((obj) => {
-              //   return obj.lockedTo === null;
-              // });
-
-              this.queryCardObjects(collection).then(data => {
-                this.setState({
-                  collection: data,
-                  isViewReady: true
-                });
-              });
-            });
-          } else {
-            collectionRef = firebase.database().ref("users/" + currentUid + "/collection");
-
-            collectionRef.once("value", (dataSnapshot) => {
-              let collection = [];
-
-              dataSnapshot.forEach(function(childSnapshot) {
-                let collectionData = childSnapshot.val();
-                collection.push(collectionData);
-              });
-
-              let filteredAvailableCollectionByRegions = collection.filter((obj) => {
-                // return (obj.playerRegion === leagueRegion[0] || obj.playerRegion === leagueRegion[1]) && obj.lockedTo === undefined;
-                return obj.playerRegion === leagueRegion[0] || obj.playerRegion === leagueRegion[1];
-              });
-
-              this.queryCardObjects(filteredAvailableCollectionByRegions).then(data => {
-                this.setState({
-                  collection: data,
-                  isViewReady: true
-                });
-              });
-            });
-          }
         });
       }
+      this.setState({
+        isUserInLeague: userInLeague
+      });
     });
+
+    getLeagueData(leagueKey, (leagueData) => {
+      this.setState({
+        leagueData: leagueData,
+        salaryCap: leagueData.salaryCap
+      });
+    });
+
+    // firebase.auth().onAuthStateChanged((user) => {
+    //   if (user) {
+    //     // User is signed in.
+    //     let currentUid = user.uid;
+    //     // Get league key
+    //     const leagueKey = this.props.params.leagueKey;
+    //
+    //     // Set league data
+    //     let leaguesRef = firebase.database().ref("leagues/" + leagueKey);
+    //     leaguesRef.once("value", (dataSnapshot) => {
+    //       let leagueData = dataSnapshot.val();
+    //       let leagueRegion = dataSnapshot.val().leagueRegion;
+    //
+    //       this.setState({
+    //         leagueData: leagueData,
+    //         salaryCap: leagueData.salaryCap
+    //       });
+    //
+    //       // Get and set user collection data
+    //       let collectionRef;
+    //       if (leagueRegion.length === 1) {
+    //         if (leagueRegion === "All") {
+    //           collectionRef = firebase.database().ref("users/" + currentUid + "/collection");
+    //         } else {
+    //           collectionRef = firebase.database().ref("users/" + currentUid + "/collection").orderByChild("playerRegion").equalTo(leagueRegion);
+    //         }
+    //         collectionRef.once("value", (dataSnapshot) => {
+    //           let collection = [];
+    //
+    //           dataSnapshot.forEach(function(childSnapshot) {
+    //             let collectionData = childSnapshot.val();
+    //             collection.push(collectionData);
+    //           });
+    //
+    //           // let filteredAvailableCollection = collection.filter((obj) => {
+    //           //   return obj.lockedTo === null;
+    //           // });
+    //
+    //           this.queryCardObjects(collection).then(data => {
+    //             this.setState({
+    //               collection: data,
+    //               isViewReady: true
+    //             });
+    //           });
+    //         });
+    //       } else {
+    //         collectionRef = firebase.database().ref("users/" + currentUid + "/collection");
+    //
+    //         collectionRef.once("value", (dataSnapshot) => {
+    //           let collection = [];
+    //
+    //           dataSnapshot.forEach(function(childSnapshot) {
+    //             let collectionData = childSnapshot.val();
+    //             collection.push(collectionData);
+    //           });
+    //
+    //           let filteredAvailableCollectionByRegions = collection.filter((obj) => {
+    //             // return (obj.playerRegion === leagueRegion[0] || obj.playerRegion === leagueRegion[1]) && obj.lockedTo === undefined;
+    //             return obj.playerRegion === leagueRegion[0] || obj.playerRegion === leagueRegion[1];
+    //           });
+    //
+    //           this.queryCardObjects(filteredAvailableCollectionByRegions).then(data => {
+    //             this.setState({
+    //               collection: data,
+    //               isViewReady: true
+    //             });
+    //           });
+    //         });
+    //       }
+    //     });
+    //   }
+    // });
   }
 
   queryCardObjects(collectionData) {

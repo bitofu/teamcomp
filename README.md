@@ -16,6 +16,12 @@ yarn start
 ## TODO:
 - Add redux to app
 - Refactor components (it is becoming to messy already)
+  - Collection
+  - League
+  - MyLeagues
+  - Openpack
+  - Packs
+  - Store
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 

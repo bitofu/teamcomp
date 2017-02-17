@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import firebase from 'firebase';
+import { getUserPacksAndCurrency } from '../actions/User';
+import { getPackData, purchasePack } from '../actions/Packs';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Card from 'grommet/components/Card';
@@ -31,36 +32,18 @@ class Store extends Component {
   }
 
   componentWillMount() {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in.
-        let currentUid = user.uid;
-        this.setState({
-          currentUid: currentUid
-        });
-
-        // Get user data
-        let userDataRef = firebase.database().ref("users/" + currentUid);
-        userDataRef.on("value", function(dataSnapshot) {
-          let userGold = dataSnapshot.val().gold;
-          let unopenedPacks = dataSnapshot.val().unopenedPacks;
-          this.setState({
-            userGold: userGold,
-            unopenedPacks: unopenedPacks
-          });
-        }.bind(this));
-
-        // Get pack data
-        let packDataRef = firebase.database().ref("packData");
-        packDataRef.on("value", function(dataSnapshot) {
-          let packData = [];
-          packData = dataSnapshot.val();
-          this.setState({
-            packData: packData
-          });
-        }.bind(this));
-      }
+    getUserPacksAndCurrency((userData) => {
+      this.setState({
+        currentUid: userData.uid,
+        userGold: userData.gold,
+        unopenedPacks: userData.unopenedPacks
+      });
     });
+    getPackData((packData) => {
+      this.setState({
+        packData: packData
+      });
+    })
   }
 
   _onClickBuy(packPrice, packQuantity) {
@@ -71,34 +54,19 @@ class Store extends Component {
     });
   }
 
-  closePopup(e) {
+  _closePopup(e) {
     e.stopPropagation();
-    this.setState({ confirmationPopup:false });
+    this.setState({ confirmationPopup: false });
   }
 
   purchasePack(e, packPrice, packQuantity) {
     e.stopPropagation();
-    // e.preventDefault();
-    const { userGold, unopenedPacks, currentUid } = this.state;
-
-    // Do calcution and deduct from user funds
-    if (userGold < packPrice) return;
-    const newUserGold = userGold - packPrice;
-
-    // Add packQuantity to current unopenedPacks
-    const newUnopenedPacks = unopenedPacks + packQuantity;
-
-    // Update new user funds and add card packs to user collection
-    var fbUpdate = {};
-    // Replace with logged in user
-    fbUpdate['/users/' + currentUid + '/gold'] = newUserGold;
-    fbUpdate['/users/' + currentUid + '/unopenedPacks'] = newUnopenedPacks;
-
-    // save all to firebase
-    firebase.database().ref().update(fbUpdate);
+    const { userGold, unopenedPacks } = this.state;
+    purchasePack(userGold, unopenedPacks, packPrice, packQuantity);
   }
 
   render() {
+    // Move into smaller reusable component
     const confirmationPopup = (this.state.confirmationPopup)
       ? <Layer closer={true} flush={false} onClose={ () => { this.setState({ confirmationPopup:false }) } }>
           <Form pad='large'>
@@ -125,16 +93,15 @@ class Store extends Component {
                 <Button label='Cancel'
                   type='reset'
                   primary={false}
-                  onClick={(e) => { this.closePopup(e) }} />
+                  onClick={(e) => { this._closePopup(e) }} />
               </Box>
             </Footer>
           </Form>
         </Layer>
       : null;
 
+    // Move into smaller reusable component
     const { packData, userGold } = this.state;
-    console.log(packData);
-    console.log(userGold);
     const listPacks = Object.keys(packData).map((key) =>
       <Tile key={key}>
         <Card thumbnail='https://firebasestorage.googleapis.com/v0/b/teamcomp-fecc4.appspot.com/o/packs%2Fleagueoflegends.jpg?alt=media'

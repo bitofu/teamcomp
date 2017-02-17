@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import * as firebase from 'firebase';
+import { watchAuthData } from './actions/Auth';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import App from './App';
 import Login from './views/Login';
@@ -16,32 +16,11 @@ import HowToPlay from './views/HowToPlay';
 
 import 'grommet/scss/vanilla/index.scss';
 
-// Should remove these and have them in config file
-const config = {
-  apiKey: "AIzaSyDZGQ_J3rRDhIAJlmwFsn_e7az1Uwpbvt0",
-  authDomain: "teamcomp-fecc4.firebaseapp.com",
-  databaseURL: "https://teamcomp-fecc4.firebaseio.com",
-  storageBucket: "teamcomp-fecc4.appspot.com"
-};
-
-firebase.initializeApp(config).database().ref();
-
 function requireAuth(nextState, replace) {
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in.
-      console.log(user);
-    } else {
-      // No user is signed in.
-      console.log('No user is signed in.');
-      browserHistory.replace({
-        pathname: '/login'
-      });
-    }
-  });
+  watchAuthData(nextState, replace);
 }
 
-ReactDOM.render((
+const root = (
   <Router history={browserHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={Lobby} onEnter={requireAuth}/>
@@ -61,6 +40,6 @@ ReactDOM.render((
       {/* <Route path="*" component={NoMatch}/> */}
     </Route>
   </Router>
-  ),
-  document.getElementById('root')
 );
+
+ReactDOM.render(root, document.getElementById('root'));

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import firebase from 'firebase';
+import { getUserCollection } from '../actions/User';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Box from 'grommet/components/Box';
@@ -25,44 +25,11 @@ class Collection extends Component {
   }
 
   componentWillMount() {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in.
-        let currentUid = user.uid;
-
-        let collectionRef = firebase.database().ref("users/" + currentUid + "/collection");
-        collectionRef.once("value", function(dataSnapshot) {
-          let collection = [];
-          dataSnapshot.forEach(function(childSnapshot) {
-            let collectionData = childSnapshot.val();
-            collection.push(collectionData);
-          });
-          this.queryCardObjects(collection).then(data => {
-            this.setState({
-              collection: data,
-              isViewReady: true
-            });
-          });
-        }.bind(this));
-      }
-    });
-  }
-
-  queryCardObjects(collectionData) {
-    let db = firebase.database().ref("players");
-    return Promise.all(
-      collectionData.map(obj => {
-        let playerKey = obj.playerKey;
-        let cardKey = obj.cardKey;
-        return db.child(playerKey).once('value')
-        .then(snapshot => {
-          let cardObj = snapshot.val();
-          cardObj.cardKey = cardKey;
-          return cardObj;
-        })
-      })
-    ).then(res => {
-      return res;
+    getUserCollection((collectionData) => {
+      this.setState({
+        collection: collectionData,
+        isViewReady: true
+      });
     });
   }
 

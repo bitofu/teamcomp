@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import firebase from 'firebase';
+import { getUserLeagues } from '../actions/User';
 import Box from 'grommet/components/Box';
 import Headline from 'grommet/components/Headline';
 import Heading from 'grommet/components/Heading';
@@ -19,40 +19,11 @@ class MyLeagues extends Component {
   }
 
   componentWillMount() {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in.
-        let currentUid = user.uid;
-
-        let userLeaguesRef = firebase.database().ref("users/" + currentUid + "/leagues");
-        userLeaguesRef.once("value", function(dataSnapshot) {
-          let myLeagues = [];
-          dataSnapshot.forEach((childSnapshot) => {
-            let leagueKey = childSnapshot.key;
-            myLeagues.push(leagueKey);
-          });
-          this.queryLeagueObjects(myLeagues).then((res) => {
-            this.setState({
-              myLeagues: res,
-              isViewReady: true
-            });
-          });
-        }.bind(this));
-      }
-    });
-  }
-
-  queryLeagueObjects(myLeagues) {
-    let db = firebase.database().ref("leagues");
-    return Promise.all(
-      myLeagues.map(leagueKey => {
-        return db.child(leagueKey).once('value')
-        .then(snapshot => {
-          return snapshot.val();
-        })
-      })
-    ).then(res => {
-      return res;
+    getUserLeagues((myLeagueData) => {
+      this.setState({
+        myLeagues: myLeagueData,
+        isViewReady: true
+      });
     });
   }
 

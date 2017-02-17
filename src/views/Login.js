@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router'
-import { login } from '../helpers/auth';
+import { login } from '../actions/Auth';
 import LoginForm from 'grommet/components/LoginForm';
 import GrommetIcon from 'grommet/components/icons/base/BrandGrommetOutline';
 import Box from 'grommet/components/Box';
