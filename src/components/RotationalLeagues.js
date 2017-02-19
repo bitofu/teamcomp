@@ -28,8 +28,8 @@ export default class RotationalLeagues extends Component {
     const { leagues } = this.state;
     const listLeagues = leagues.map((league) =>
       <Tile key={league.leagueKey} >
-        <Card margin="small"
-          contentPad="large"
+        <Card thumbnail='https://firebasestorage.googleapis.com/v0/b/teamcomp-fecc4.appspot.com/o/lcs.jpg?alt=media'
+          contentPad={{'vertical': 'medium'}}
           direction="column"
           label={ (league.leagueRegion.length === 1) ? league.leagueRegion : league.leagueRegion[0] + " and " + league.leagueRegion[1] }
           link={

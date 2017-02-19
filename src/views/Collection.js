@@ -132,7 +132,7 @@ class Collection extends Component {
 
     if (isViewReady) {
       return (
-        <Box colorIndex="light-2">
+        <Box colorIndex="light-2" full={true}>
           <Tabs>
             <Tab title='All'>
               { this.renderCards('All') }

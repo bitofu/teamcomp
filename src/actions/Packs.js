@@ -66,10 +66,13 @@ function saveCardsToCollection(cardObjs, unopenedPacks) {
       let updateObj = {
         'cardKey': cardKey,
         'playerKey': playerKey,
-        'playerRegion': playerRegion
+        'playerRegion': playerRegion,
+        'uid': currentUid
       };
-      // Add object to user collection
-      updates['/users/' + currentUid + '/collection/' + cardKey ] = updateObj
+      // Add key to user collection
+      updates['/users/' + currentUid + '/collection/' + cardKey ] = true
+      // Add object to cards
+      updates['/cards/' + cardKey ] = updateObj
       // Save to firebase
       return database.ref().update(updates).then( () => {
         return updateObj;
