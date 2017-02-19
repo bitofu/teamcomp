@@ -83,12 +83,12 @@ class AppHeader extends Component {
                 icon={<SettingsOptionIcon />}
                 size='small'
                 closeOnClick={true}>
-                <Anchor href='#' className="teamcomp-blue">
+                {/* <Anchor href='#' className="teamcomp-blue">
                   Profile
                 </Anchor>
                 <Anchor href='#' className="teamcomp-blue">
                   Change Password
-                </Anchor>
+                </Anchor> */}
                 <Anchor className="teamcomp-blue"
                         onClick={(e) => this._logout(e)}>
                   Logout

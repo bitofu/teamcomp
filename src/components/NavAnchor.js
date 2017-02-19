@@ -30,7 +30,7 @@ export default class NavAnchor extends Component {
     let href = router.createPath(path);
     return (
       <Anchor {...this.props} className={className} href={href}
-        onClick={this._onClick} />
+        onClick={this._onClick.bind(this)} />
     );
   }
 };

@@ -31,7 +31,15 @@ class MyLeagues extends Component {
     const { myLeagues } = this.state;
     if (myLeagues === null || myLeagues.length === 0) {
       return (
-        'You are currently in no leagues'
+        <Box justify="center"
+             align="center"
+             full={true}
+             colorIndex="light-2">
+          <Headline strong={false}
+            size='medium'>
+            You are currently in no leagues
+          </Headline>
+        </Box>
       );
     } else {
       const listMyLeagues = myLeagues.map((league) => {

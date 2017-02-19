@@ -6,6 +6,7 @@ import Tile from 'grommet/components/Tile';
 import Card from 'grommet/components/Card';
 import Box from 'grommet/components/Box';
 import Heading from 'grommet/components/Heading';
+import Headline from 'grommet/components/Headline';
 import Anchor from 'grommet/components/Anchor';
 import MoneyIcon from 'grommet/components/icons/base/Money';
 import Layer from 'grommet/components/Layer';
@@ -26,7 +27,8 @@ class Store extends Component {
       packData: [],
       userGold: 0,
       unopenedPacks: 0,
-      currentUid: null
+      currentUid: null,
+      isViewReady: false
     };
     this._onClickBuy = this._onClickBuy.bind(this);
   }
@@ -41,7 +43,8 @@ class Store extends Component {
     });
     getPackData((packData) => {
       this.setState({
-        packData: packData
+        packData: packData,
+        isViewReady: true
       });
     })
   }
@@ -101,7 +104,7 @@ class Store extends Component {
       : null;
 
     // Move into smaller reusable component
-    const { packData, userGold } = this.state;
+    const { isViewReady, packData, userGold } = this.state;
     const listPacks = Object.keys(packData).map((key) =>
       <Tile key={key}>
         <Card thumbnail='https://firebasestorage.googleapis.com/v0/b/teamcomp-fecc4.appspot.com/o/packs%2Fleagueoflegends.jpg?alt=media'
@@ -121,16 +124,27 @@ class Store extends Component {
       </Tile>
     );
 
-    return (
-      <Box full={true} colorIndex="light-2">
-        { confirmationPopup }
-        <Tiles selectable={false}
-          fill={true}
-          flush={false}>
-          { listPacks }
-        </Tiles>
-      </Box>
-    );
+    if (isViewReady) {
+      return (
+        <Box full={true} colorIndex="light-2">
+          { confirmationPopup }
+          <Tiles selectable={false}
+            fill={true}
+            flush={false}>
+            { listPacks }
+          </Tiles>
+        </Box>
+      );
+    } else {
+      return (
+        <Box justify="center" align="center" full={true}>
+          <Headline strong={false}
+            size='large'>
+            Loading...
+          </Headline>
+        </Box>
+      );
+    }
   }
 }
 

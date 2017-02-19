@@ -3,6 +3,7 @@ import { getLeagues } from '../actions/Leagues';
 import Box from 'grommet/components/Box';
 import Card from 'grommet/components/Card';
 import Heading from 'grommet/components/Heading';
+import Headline from 'grommet/components/Headline';
 import Tile from 'grommet/components/Tile';
 import Tiles from 'grommet/components/Tiles';
 import LinkNextIcon from 'grommet/components/icons/base/LinkNext';
@@ -25,13 +26,14 @@ export default class RotationalLeagues extends Component {
   }
 
   render() {
-    const { leagues } = this.state;
+    const { isViewReady, leagues } = this.state;
     const listLeagues = leagues.map((league) =>
       <Tile key={league.leagueKey} >
         <Card thumbnail='https://firebasestorage.googleapis.com/v0/b/teamcomp-fecc4.appspot.com/o/lcs.jpg?alt=media'
           contentPad={{'vertical': 'medium'}}
+          margin='medium'
           direction="column"
-          label={ (league.leagueRegion.length === 1) ? league.leagueRegion : league.leagueRegion[0] + " and " + league.leagueRegion[1] }
+          label={ "Type: " + league.gameType }
           link={
             <NavAnchor path={"/league/" + league.leagueKey } label="Enter"
               icon={<LinkNextIcon />} />
@@ -43,14 +45,25 @@ export default class RotationalLeagues extends Component {
       </Tile>
     );
 
-    return (
-      <Box>
-        <Tiles selectable={false}
-          fill={true}
-          flush={false} >
-          { listLeagues }
-        </Tiles>
-      </Box>
-    );
+    if (isViewReady) {
+      return (
+        <Box>
+          <Tiles selectable={false}
+            fill={true}
+            flush={false} >
+            { listLeagues }
+          </Tiles>
+        </Box>
+      );
+    } else {
+      return (
+        <Box align="center">
+          <Headline strong={false}
+            size='small'>
+            Loading...
+          </Headline>
+        </Box>
+      );
+    }
   }
 };
