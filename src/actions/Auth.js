@@ -40,7 +40,10 @@ export function saveUser (user) {
   return firebase.database().ref().child(`users/${user.uid}`)
     .set({
       email: user.email,
-      uid: user.uid
+      uid: user.uid,
+      unopenedPacks: 0,
+      gold: 0,
+      silver: 0
     })
     .then(() => user)
 }

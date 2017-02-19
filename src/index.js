@@ -4,6 +4,7 @@ import { watchAuthData } from './actions/Auth';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import App from './App';
 import Login from './views/Login';
+import Register from './views/Register';
 import Lobby from './views/Lobby';
 import Collection from './views/Collection';
 import Schedules from './views/Schedules';
@@ -25,7 +26,7 @@ const root = (
     <Route path="/" component={App}>
       <IndexRoute component={Lobby} onEnter={requireAuth}/>
       <Route path="login" component={Login} />
-      {/* <Route path="register" component={Register} /> */}
+      <Route path="register" component={Register} />
       <Route path="lobby" component={Lobby} onEnter={requireAuth} />
       <Route path="login" component={Login} />
       <Route path="league/:leagueKey" component={League} onEnter={requireAuth} />
