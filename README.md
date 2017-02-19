@@ -17,6 +17,7 @@ yarn start
 - Refactor League component
 - Add how to play component
 - Add lobby content
+- Fix bugs from github
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
