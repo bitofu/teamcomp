@@ -182,7 +182,7 @@ class League extends Component {
                   <div className="player-tier">{obj.Tier}</div>
                 </div>
                 <div className="player-img-container">
-                  <img className="player-img" alt="presentation" src={ (obj.League === 'LMS' || obj.League === 'LCK') ? playerImgPrefix + "unknown" + playerImgSuffix : playerImgPrefix + obj.Name + playerImgSuffix } />
+                  <img className="player-img" alt="presentation" src={ playerImgPrefix + obj.Name + playerImgSuffix } />
                 </div>
                 <div className="player-stats-list">
                   <div className="player-stats-info">{obj.TeamNameFull} • {obj.League}</div>
@@ -233,7 +233,7 @@ class League extends Component {
                   </div> */}
                 </div>
               </div>
-              <img className="team-logo" alt="presentation" src={ (obj.League === 'LMS' || obj.League === 'LCK') ? null : teamLogoPrefix + obj.TeamNameShort + teamLogoSuffix } />
+              <img className="team-logo" alt="presentation" src={ teamLogoPrefix + obj.TeamNameShort + teamLogoSuffix } />
             </div>
           </Tile>
         );
