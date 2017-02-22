@@ -57,7 +57,7 @@ class Openpack extends Component {
               <div className="player-tile">
                 <div className="player-card">
                   <div className="player-name-container">
-                    <div className="player-name">{obj.Name} <span className="player-position">{obj.Position}</span></div>
+                    <div className="player-name">{obj.Name} <span className="player-position">{(obj.Position === "Support") ? "Sup" : obj.Position}</span></div>
                     <div className="player-tier">{obj.Tier}</div>
                   </div>
                   <div className="player-img-container">

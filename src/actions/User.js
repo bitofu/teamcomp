@@ -36,7 +36,8 @@ export function getUserCollection(callback) {
         });
         queryCardObjects(collectionCardKeys).then(cardObjs => {
           queryPlayerObjects(cardObjs).then(collectionData => {
-            callback(collectionData);
+            let collection = filterByAlphaOrder(collectionData);
+            callback(collection);
           });
         });
       });
@@ -116,13 +117,20 @@ export function lockInUserToLeague(top, mid, jungle, adc, support, leagueKey, en
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
       const uid = user.uid;
-      getUserPacksAndCurrency(userData => {
+      const userDataRef = database.ref().child("users/" + uid);
+
+      userDataRef.once("value", (dataSnapshot) => {
+        let userData = dataSnapshot.val();
         let userGold = userData.gold;
+
         if (userGold < entryFee) {
           callback('Failed');
         } else {
           let updates = {};
           let newUserGold = userGold - entryFee;
+          console.log(newUserGold);
+          // Update user gold
+          updates['users/' + uid + '/gold'] = newUserGold;
           // Save player key in league
           updates['leagues/' + leagueKey + '/users/' + uid] = true;
           // Save cards to league
@@ -131,17 +139,42 @@ export function lockInUserToLeague(top, mid, jungle, adc, support, leagueKey, en
           updates['users/' + uid + '/leagues/' + leagueKey + '/' + jungle.cardKey] = true;
           updates['users/' + uid + '/leagues/' + leagueKey + '/' + adc.cardKey] = true;
           updates['users/' + uid + '/leagues/' + leagueKey + '/' + support.cardKey] = true;
-          // Update user gold
-          updates['users/' + uid + '/gold'] = newUserGold;
           // Save to firebase
           database.ref().update(updates).then( () => {
             callback('Success');
           });
         }
-      })
+      });
     }
   })
 }
+
+export function filterCollectionByPosition(position, collection) {
+  if (position === 'All Positions') return collection;
+  let filteredCollection = collection.filter((obj) => {
+    return obj.Position === position;
+  });
+  return filteredCollection;
+}
+
+export function filterCollectionByRegion(region, collection) {
+  if (region === 'All Regions') return collection;
+  let filteredCollection = collection.filter((obj) => {
+    return obj.League === region;
+  });
+  return filteredCollection;
+}
+
+function filterByAlphaOrder(collectionData) {
+  return collectionData.sort(function(a, b) {
+    const nameA = a.Name.toLowerCase();
+    const nameB = b.Name.toLowerCase();
+    if (nameA < nameB) return -1; //sort string ascending
+    if (nameA > nameB) return 1;
+    return 0; //default return value (no sorting)
+  });
+}
+
 
 function queryCardObjects(collectionCardKeys) {
   let db = database.ref("cards");

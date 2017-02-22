@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
-import { isUserInLeague, getUserLeagueDraft, getUserCollectionByRegionsAndAvailablity, lockInUserToLeague } from '../actions/User';
+import {
+  isUserInLeague,
+  getUserLeagueDraft,
+  getUserCollectionByRegionsAndAvailablity,
+  lockInUserToLeague,
+  filterCollectionByPosition,
+  filterCollectionByRegion
+} from '../actions/User';
 import { getLeagueData } from '../actions/Leagues';
 import LeagueDetails from '../components/LeagueDetails';
 import Box from 'grommet/components/Box';
@@ -14,8 +21,6 @@ import Anchor from 'grommet/components/Anchor';
 import Button from 'grommet/components/Button';
 import LockIcon from 'grommet/components/icons/base/Lock';
 import Headline from 'grommet/components/Headline';
-import Tabs from 'grommet/components/Tabs';
-import Tab from 'grommet/components/Tab';
 // import CircleInformationIcon from 'grommet/components/icons/base/CircleInformation';
 import Layer from 'grommet/components/Layer';
 import Form from 'grommet/components/Form';
@@ -23,6 +28,7 @@ import Header from 'grommet/components/Header';
 import Footer from 'grommet/components/Footer';
 import FormFields from 'grommet/components/FormFields';
 import Paragraph from 'grommet/components/Paragraph';
+import Select from 'grommet/components/Select';
 
 const playerImgPrefix = "https://firebasestorage.googleapis.com/v0/b/teamcomp-fecc4.appspot.com/o/players%2F";
 const playerImgSuffix = ".png?alt=media";
@@ -35,6 +41,8 @@ class League extends Component {
     this.state = {
       leagueData: null,
       collection: [],
+      filterByPosition: 'All Positions',
+      filterByRegion: 'All Regions',
       salaryCap: 0,
       isViewReady: false,
       confirmationPopup: false,
@@ -50,6 +58,8 @@ class League extends Component {
     this._draftPlayer = this._draftPlayer.bind(this);
     this._removePlayer = this._removePlayer.bind(this);
     this._lockIn = this._lockIn.bind(this);
+    this._onFilterByPosition = this._onFilterByPosition.bind(this);
+    this._onFilterByRegion = this._onFilterByRegion.bind(this);
   }
 
   componentWillMount() {
@@ -87,6 +97,16 @@ class League extends Component {
         }
       });
     });
+  }
+
+  _onFilterByPosition(e) {
+    let value = e.value.value;
+    this.setState({filterByPosition: value});
+  }
+
+  _onFilterByRegion(e) {
+    let value = e.value.value;
+    this.setState({filterByRegion: value});
   }
 
   _draftPlayer(player, event) {
@@ -156,11 +176,11 @@ class League extends Component {
     });
   }
 
-  filterCollection(position, collection) {
-    let filteredCollection = collection.filter((obj) => {
-      return obj.Position === position;
-    });
-    return filteredCollection;
+  filterCollection(collection) {
+    const { filterByPosition, filterByRegion } = this.state;
+    let collectionByPosition = filterCollectionByPosition(filterByPosition, collection);
+    let collectionByPositionAndRegion = filterCollectionByRegion(filterByRegion, collectionByPosition);
+    return collectionByPositionAndRegion;
   }
 
   // TODO: REFACTOR THIS PIECE OF SHIT
@@ -178,7 +198,7 @@ class League extends Component {
             <div className="player-tile">
               <div className="player-card">
                 <div className="player-name-container">
-                  <div className="player-name">{obj.Name} <span className="player-position">{obj.Position}</span></div>
+                  <div className="player-name">{obj.Name} <span className="player-position">{(obj.Position === "Support") ? "Sup" : obj.Position}</span></div>
                   <div className="player-tier">{obj.Tier}</div>
                 </div>
                 <div className="player-img-container">
@@ -254,9 +274,9 @@ class League extends Component {
           'No cards in collection'
         );
       } else {
-        let filterCollection = (position === 'All') ? collection : this.filterCollection(position, collection);
+        let filteredCollection = this.filterCollection(collection);
 
-        const listCollection = filterCollection.map((obj) => {
+        const listCollection = filteredCollection.map((obj) => {
           const position = obj.Position.toLowerCase();
 
           return (
@@ -266,7 +286,7 @@ class League extends Component {
               <div className="player-tile">
                 <div className="player-card">
                   <div className="player-name-container">
-                    <div className="player-name">{obj.Name} <span className="player-position">{obj.Position}</span></div>
+                    <div className="player-name">{obj.Name} <span className="player-position">{(obj.Position === "Support") ? "Sup" : obj.Position}</span></div>
                     <div className="player-tier">{obj.Tier}</div>
                   </div>
                   <div className="player-img-container">
@@ -339,30 +359,45 @@ class League extends Component {
   }
 
   renderCollection() {
+    const { filterByPosition, filterByRegion } = this.state;
+
     return (
       <Box size={{width: {min: 'medium'}}}
            flex={true}
            pad='medium'>
-        <Tabs>
-          <Tab title='All'>
-            { this.renderCards('All') }
-          </Tab>
-          <Tab title='Top'>
-            { this.renderCards('Top') }
-          </Tab>
-          <Tab title='Mid'>
-            { this.renderCards('Mid') }
-          </Tab>
-          <Tab title='Jungle'>
-            { this.renderCards('Jungle') }
-          </Tab>
-          <Tab title='ADC'>
-            { this.renderCards('ADC') }
-          </Tab>
-          <Tab title='Support'>
-            { this.renderCards('Support') }
-          </Tab>
-        </Tabs>
+        <Box direction='row'
+           justify='center'
+           align='center'
+           pad='medium'>
+         <Box pad={{horizontal: 'small'}}>
+           <Select options={[
+             {value: 'All Positions', label: 'All Positions'},
+             {value: 'Top', label: 'Top'},
+             {value: 'Mid', label: 'Mid'},
+             {value: 'Jungle', label: 'Jungle'},
+             {value: 'ADC', label: 'ADC'},
+             {value: 'Support', label: 'Support'}]}
+             onChange={this._onFilterByPosition}
+             value={filterByPosition}
+             placeholder='All'
+           />
+         </Box>
+         <Box pad={{horizontal: 'small'}}>
+           <Select options={[
+             {value: 'All Regions', label: 'All Regions'},
+             {value: 'NA LCS', label: 'NA LCS'},
+             {value: 'EU LCS', label: 'EU LCS'},
+             {value: 'LCK', label: 'LCK'},
+             {value: 'LMS', label: 'LMS'}]}
+             onChange={this._onFilterByRegion}
+             value={filterByRegion}
+             placeholder='All Regions'
+           />
+         </Box>
+        </Box>
+        <Box>
+          { this.renderCards() }
+        </Box>
       </Box>
     );
   }
@@ -511,7 +546,7 @@ class League extends Component {
   renderDraftActions() {
     const { salaryCap, leagueData, isUserInLeague } = this.state;
     return (
-      <Box size={{width: {min: 'large'}}}
+      <Box size={{width: {min: 'medium'}}}
            separator='left'>
         <Box direction='row'
            responsive={true}

@@ -57,7 +57,7 @@ class Packs extends Component {
             <Card thumbnail='https://firebasestorage.googleapis.com/v0/b/teamcomp-fecc4.appspot.com/o/packs%2Fleagueoflegends.jpg?alt=media'
               className="card-pack"
               margin="small"
-              contentPad="large"
+              contentPad="medium"
               direction="column"
               heading='Classic Pack'
               label='League of Legends'
