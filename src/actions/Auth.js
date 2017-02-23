@@ -16,6 +16,17 @@ export function watchAuthData(nextState, replace) {
   });
 }
 
+export function watchAuthDataLanding(nextState, replace) {
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      // User is signed in.
+      browserHistory.replace({
+        pathname: '/lobby'
+      });
+    }
+  });
+}
+
 export function login(email, pw) {
   return firebase.auth().signInWithEmailAndPassword(email, pw)
 }
@@ -24,6 +35,7 @@ export function logout() {
   firebase.auth().signOut().then(function() {
     // Sign-out successful.
     console.log('Sign-out successful');
+    localStorage.removeItem('currentUser');
   }, function(error) {
     // An error happened.
     console.log('Error logging out');

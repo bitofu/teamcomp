@@ -15,6 +15,7 @@ class AppHeader extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isUserLoggedIn: false,
       userGold: 0,
       userSilver: 0,
       unopenedPacks: 0
@@ -24,11 +25,18 @@ class AppHeader extends Component {
 
   componentWillMount() {
     getUserPacksAndCurrency((userData) => {
-      this.setState({
-        userGold: userData.gold,
-        userSilver: userData.silver,
-        unopenedPacks: userData.unopenedPacks
-      });
+      if (userData === 'No user is signed in.') {
+        this.setState({
+          isUserLoggedIn: false
+        });
+      } else {
+        this.setState({
+          isUserLoggedIn: true,
+          userGold: userData.gold,
+          userSilver: userData.silver,
+          unopenedPacks: userData.unopenedPacks
+        });
+      }
     });
   }
 
@@ -38,73 +46,98 @@ class AppHeader extends Component {
   }
 
   render() {
-    const { userGold, unopenedPacks } = this.state;
-    return (
-      <Header justify="center" colorIndex="grey-1">
-        <Box
-            direction="row"
-            responsive={false}
-            justify="start"
-            align="center"
-            pad={{horizontal: 'medium'}}
-            flex="grow">
-          <GrommetIcon className="brand-logo" size="large" />
-          <Box pad="small" />
-          <Menu label="Menu" inline={true} direction="row" flex="grow">
-            <NavAnchor path="/lobby">Lobby</NavAnchor>
-            <NavAnchor path="/myleagues">My Leagues</NavAnchor>
-            <NavAnchor path="/collection">Collection</NavAnchor>
-            {/* <NavAnchor path="/schedules">Schedules</NavAnchor> */}
-            <NavAnchor path="/store">Store</NavAnchor>
-            <NavAnchor path="/howtoplay">How To Play</NavAnchor>
-          </Menu>
-
-          <Box flex="grow" align="end">
-            <Menu label="Profile" inline={true} direction="row" flex="grow">
-              <div>
-                <Anchor icon={<MultipleIcon />}
-                  label={"My Packs (" + unopenedPacks + ")"}
-                  animateIcon={true}
-                  primary={false}
-                  reverse={false}
-                  disabled={false}
-                  path="/packs" />
-              </div>
-              <div>
-                <Anchor icon={<MoneyIcon className="gold-icon" />}
-                  className="gold-icon"
-                  label={userGold + " Gold"}
-                  animateIcon={true}
-                  primary={false}
-                  reverse={false}
-                  disabled={false} />
-              </div>
-              <Menu responsive={true}
-                icon={<SettingsOptionIcon />}
-                size='small'
-                closeOnClick={true}>
-                {/* <Anchor href='#' className="teamcomp-blue">
-                  Profile
-                </Anchor>
-                <Anchor href='#' className="teamcomp-blue">
-                  Change Password
-                </Anchor> */}
-                <Anchor className="teamcomp-blue"
-                        onClick={(e) => this._logout(e)}>
-                  Logout
-                </Anchor>
-              </Menu>
-              {/* <Anchor icon={<CurrencyIcon />}
-                label={userSilver + " Silver"}
-                animateIcon={true}
-                primary={false}
-                reverse={false}
-                disabled={false} /> */}
+    const { isUserLoggedIn } = this.state;
+    if (isUserLoggedIn) {
+      const { userGold, unopenedPacks } = this.state;
+      return (
+        <Header justify="center" colorIndex="grey-1">
+          <Box
+              direction="row"
+              responsive={false}
+              justify="start"
+              align="center"
+              pad={{horizontal: 'medium'}}
+              flex="grow">
+            <GrommetIcon className="brand-logo" size="large" />
+            <Box pad="small" />
+            <Menu label="Menu" inline={true} direction="row" flex="grow">
+              <NavAnchor path="/lobby">Lobby</NavAnchor>
+              <NavAnchor path="/myleagues">My Leagues</NavAnchor>
+              <NavAnchor path="/collection">Collection</NavAnchor>
+              {/* <NavAnchor path="/schedules">Schedules</NavAnchor> */}
+              <NavAnchor path="/store">Store</NavAnchor>
+              <NavAnchor path="/howtoplay">How To Play</NavAnchor>
             </Menu>
+
+            <Box flex="grow" align="end">
+              <Menu label="Profile" inline={true} direction="row" flex="grow">
+                <div>
+                  <Anchor icon={<MultipleIcon />}
+                    label={"My Packs (" + unopenedPacks + ")"}
+                    animateIcon={true}
+                    primary={false}
+                    reverse={false}
+                    disabled={false}
+                    path="/packs" />
+                </div>
+                <div>
+                  <Anchor icon={<MoneyIcon className="gold-icon" />}
+                    className="gold-icon"
+                    label={userGold + " Gold"}
+                    animateIcon={true}
+                    primary={false}
+                    reverse={false}
+                    disabled={false} />
+                </div>
+                <Menu responsive={true}
+                  icon={<SettingsOptionIcon />}
+                  size='small'
+                  closeOnClick={true}>
+                  {/* <Anchor href='#' className="teamcomp-blue">
+                    Profile
+                  </Anchor>
+                  <Anchor href='#' className="teamcomp-blue">
+                    Change Password
+                  </Anchor> */}
+                  <Anchor className="teamcomp-blue"
+                          onClick={(e) => this._logout(e)}>
+                    Logout
+                  </Anchor>
+                </Menu>
+                {/* <Anchor icon={<CurrencyIcon />}
+                  label={userSilver + " Silver"}
+                  animateIcon={true}
+                  primary={false}
+                  reverse={false}
+                  disabled={false} /> */}
+              </Menu>
+            </Box>
           </Box>
-        </Box>
-      </Header>
-    );
+        </Header>
+      );
+    } else {
+      return (
+        <Header justify="center" colorIndex="grey-1">
+          <Box
+              direction="row"
+              responsive={false}
+              justify="start"
+              align="center"
+              pad={{horizontal: 'medium'}}
+              flex="grow">
+            <GrommetIcon className="brand-logo" size="large" />
+            <Box pad="small" />
+
+            <Box flex="grow" align="end">
+              <Menu label="Menu" inline={true} direction="row" flex="grow">
+                <NavAnchor path="/login">Login</NavAnchor>
+                {/* <NavAnchor path="/register">Register</NavAnchor> */}
+              </Menu>
+            </Box>
+          </Box>
+        </Header>
+      );
+    }
   }
 }
 

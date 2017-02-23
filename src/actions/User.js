@@ -18,6 +18,8 @@ export function getUserPacksAndCurrency(callback) {
 
         callback(userObj)
       });
+    } else {
+      callback('No user is signed in.');
     }
   });
 }

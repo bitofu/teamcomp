@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { watchAuthData } from './actions/Auth';
+import { watchAuthData, watchAuthDataLanding } from './actions/Auth';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 import App from './App';
+import Landing from './views/Landing';
 import Login from './views/Login';
 import Register from './views/Register';
 import Lobby from './views/Lobby';
@@ -21,10 +22,14 @@ function requireAuth(nextState, replace) {
   watchAuthData(nextState, replace);
 }
 
+function requireAuthLanding(nextState, replace) {
+  watchAuthDataLanding(nextState, replace);
+}
+
 const root = (
   <Router history={browserHistory}>
     <Route path="/" component={App}>
-      <IndexRoute component={Lobby} onEnter={requireAuth}/>
+      <IndexRoute component={Landing} onEnter={requireAuthLanding} />
       <Route path="login" component={Login} />
       <Route path="register" component={Register} />
       <Route path="lobby" component={Lobby} onEnter={requireAuth} />
