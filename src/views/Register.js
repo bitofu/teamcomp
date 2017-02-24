@@ -53,6 +53,11 @@ class Register extends Component {
     this._onChange({ event, password });
   }
 
+  _validateEmail(email) {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  }
+
   _onSubmit (event) {
     event.preventDefault();
     let { password, email } = this.state;
@@ -60,10 +65,16 @@ class Register extends Component {
     email = email.trim();
     password = password.trim();
 
-    register(email, password).then(res => {
-      console.log(res);
-      browserHistory.push('lobby');
-    });
+    const validEmail = this._validateEmail(email);
+
+    if (validEmail) {
+      register(validEmail, password).then(res => {
+        console.log(res);
+        browserHistory.push('lobby');
+      });
+    } else {
+      alert('Please enter a valid email');
+    }
   }
 
   render () {

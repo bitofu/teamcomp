@@ -118,8 +118,7 @@ class AppHeader extends Component {
     } else {
       return (
         <Header justify="center" colorIndex="grey-1">
-          <Box
-              direction="row"
+          <Box direction="row"
               responsive={false}
               justify="start"
               align="center"
