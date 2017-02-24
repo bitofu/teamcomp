@@ -50,9 +50,9 @@ class Landing extends Component {
 
     email = email.trim();
 
-    const validEmail = this._validateEmail(email);
+    const isValidEmail = this._validateEmail(email);
 
-    if (validEmail) {
+    if (isValidEmail) {
       // Store email
     } else {
       alert('Please enter a valid email');
@@ -137,7 +137,7 @@ class Landing extends Component {
           </Box>
           <Box pad="large" basis='1/2'>
             <Heading tag="h2" strong={true}>
-              All Your favourite players. In their absolute prime.
+              All your favourite players. In their absolute prime.
             </Heading>
             <Paragraph className="paragraph-fix" size="large">
               Lorem ipsum dolor sit amet, dicat sonet congue ei mei, est summo

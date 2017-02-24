@@ -65,10 +65,10 @@ class Register extends Component {
     email = email.trim();
     password = password.trim();
 
-    const validEmail = this._validateEmail(email);
+    const isValidEmail = this._validateEmail(email);
 
-    if (validEmail) {
-      register(validEmail, password).then(res => {
+    if (isValidEmail) {
+      register(email, password).then(res => {
         console.log(res);
         browserHistory.push('lobby');
       });
