@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router'
 import { login } from '../actions/Auth';
-import {observer} from 'mobx-react';
 import userStore from '../stores/User';
 import LoginForm from 'grommet/components/LoginForm';
 import GrommetIcon from 'grommet/components/icons/base/BrandGrommetOutline';
 import Box from 'grommet/components/Box';
 // import Anchor from 'grommet/components/Anchor';
 
-@observer
 class Login extends Component {
   handleSubmit(fields) {
-    userStore.testMount();
     console.log(fields);
-    login(fields.username, fields.password).then( () => {
+    login(fields.username, fields.password, function(response) {
+      console.log('loggered', response);
       browserHistory.push('lobby');
+    }, function(error) {
+      console.log(error);
     });
   }
   

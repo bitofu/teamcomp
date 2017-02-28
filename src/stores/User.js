@@ -1,9 +1,18 @@
 import { observable } from 'mobx';
 
 class UserStore {
+  @observable isAuth;
+
+  constructor() {
+    this.isAuth = false;
+  };
+
+  toggleAuth() {
+    this.isAuth = !this.isAuth;
+  };
 
   testMount(text) {
-    (text) ? console.log(test) : console.log('mounted');
+    (text) ? console.log(text) : console.log('mounted');
   };
 
 }

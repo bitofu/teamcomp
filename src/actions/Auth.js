@@ -1,5 +1,6 @@
 import * as firebase from 'firebase';
 import { browserHistory } from 'react-router';
+import userStore from '../stores/User';
 
 export function watchAuthData(nextState, replace) {
   firebase.auth().onAuthStateChanged((user) => {
@@ -27,8 +28,11 @@ export function watchAuthDataLanding(nextState, replace) {
   });
 }
 
-export function login(email, pw) {
-  return firebase.auth().signInWithEmailAndPassword(email, pw)
+export function login(email, pw, cb, errorCb) {
+  firebase.auth().signInWithEmailAndPassword(email, pw).then((response) => {
+    userStore.toggleAuth();
+    cb(response);
+  }).catch((error) => { errorCb(error); });
 }
 
 export function logout() {

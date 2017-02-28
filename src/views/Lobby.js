@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+import userStore from '../stores/User';
 import Box from 'grommet/components/Box';
 import Heading from 'grommet/components/Heading';
 // import Hero from 'grommet/components/Hero';
 import RotationalLeagues from '../components/RotationalLeagues';
 import RegularLeagues from '../components/RegularLeagues';
 
+@observer
 export default class Lobby extends Component {
   render() {
+    console.log(userStore.isAuth);
     return (
       <Box colorIndex="light-2" full={true}>
         <Box align="center">
