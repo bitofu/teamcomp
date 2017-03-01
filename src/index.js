@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { watchAuthData, watchAuthDataLanding } from './actions/Auth';
 import { Router, Route, IndexRoute, browserHistory } from 'react-router';
-import { useStrict } from 'mobx';
 import App from './App';
 import Landing from './views/Landing';
 import Login from './views/Login';
@@ -18,8 +17,6 @@ import MyLeagues from './views/MyLeagues';
 import HowToPlay from './views/HowToPlay';
 
 import 'grommet/scss/vanilla/index.scss';
-
-useStrict(true);
 
 function requireAuth(nextState, replace) {
   watchAuthData(nextState, replace);

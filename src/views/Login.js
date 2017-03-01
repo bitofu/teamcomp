@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router'
 import { login } from '../actions/Auth';
-import userStore from '../stores/User';
 import LoginForm from 'grommet/components/LoginForm';
 import GrommetIcon from 'grommet/components/icons/base/BrandGrommetOutline';
 import Box from 'grommet/components/Box';
@@ -9,14 +8,14 @@ import Box from 'grommet/components/Box';
 
 class Login extends Component {
   handleSubmit(fields) {
-    console.log(fields);
-    login(fields.username, fields.password, function(response) {
-      console.log('loggered', response);
-      browserHistory.push('lobby');
-    }, function(error) {
-      console.log(error);
+    login(fields.username, fields.password, authenticated => {
+      if (authenticated) {
+        browserHistory.push('lobby');
+      } else {
+        console.log('login failed');
+      };
     });
-  }
+  };
   
   render () {
     return (

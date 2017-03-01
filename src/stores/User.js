@@ -1,21 +1,26 @@
-import { observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 class UserStore {
-  @observable isAuth;
+  @observable currentUser;
 
   constructor() {
-    this.isAuth = false;
+    this.currentUser = null;
   };
 
-  toggleAuth() {
-    this.isAuth = !this.isAuth;
+  @computed get isAuth() {
+    return this.currentUser !== null;
   };
 
-  testMount(text) {
-    (text) ? console.log(text) : console.log('mounted');
+  @action setUser(user) {
+    this.currentUser = user;
+  };
+  
+  @action logout() {
+    this.currentUser = null;
+    console.log('logging out', this.currentUser)
   };
 
-}
+};
 
 const userStore = new UserStore();
 export default userStore;

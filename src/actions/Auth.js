@@ -1,45 +1,54 @@
 import * as firebase from 'firebase';
 import { browserHistory } from 'react-router';
-import userStore from '../stores/User';
+import currentUser from '../stores/User';
 
 export function watchAuthData(nextState, replace) {
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in.
-      localStorage.setItem('currentUser', JSON.stringify(user));
-    } else {
-      // No user is signed in.
-      console.log('No user is signed in.');
-      browserHistory.replace({
-        pathname: '/login'
-      });
-    }
-  });
-}
+  if (!currentUser.isAuth) {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        // User is signed in.
+        // localStorage.setItem('currentUser', JSON.stringify(user));
+        currentUser.setUser(user);
+      } else {
+        // No user is signed in.
+        console.log('No user is signed in.');
+        browserHistory.replace({
+          pathname: '/login'
+        });
+      };
+    });
+  };
+};
 
 export function watchAuthDataLanding(nextState, replace) {
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in.
-      browserHistory.replace({
-        pathname: '/lobby'
-      });
-    }
-  });
-}
+  if (!currentUser.isAuth) {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        // User is signed in.
+        browserHistory.replace({ pathname: '/lobby' });
+      };
+    });
+  };
+};
 
-export function login(email, pw, cb, errorCb) {
-  firebase.auth().signInWithEmailAndPassword(email, pw).then((response) => {
-    userStore.toggleAuth();
-    cb(response);
-  }).catch((error) => { errorCb(error); });
+export function login(email, pw, cb) {
+  firebase.auth().signInWithEmailAndPassword(email, pw)
+  .then(user => {
+    currentUser.setUser(user);
+    cb(true);
+  })
+  .catch(error => {
+    cb(false);
+  });
 }
 
 export function logout() {
   firebase.auth().signOut().then(function() {
     // Sign-out successful.
     console.log('Sign-out successful');
-    localStorage.removeItem('currentUser');
+    currentUser.logout();
+    browserHistory.replace({ pathname: '/login' });
+    // localStorage.removeItem('currentUser');
   }, function(error) {
     // An error happened.
     console.log('Error logging out');
