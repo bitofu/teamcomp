@@ -1,4 +1,4 @@
-import database from './database';
+import database from '../database';
 
 export function getLeagues(type, callback) {
   let leaguesRef = database.ref("leagues").orderByChild("leagueType").equalTo(type);

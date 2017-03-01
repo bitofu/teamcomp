@@ -1,27 +1,28 @@
-import database from './database';
+import database from '../database';
 import firebase from 'firebase';
+import userStore from '../stores/User';
 
 export function getUserPacksAndCurrency(callback) {
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      const uid = user.uid;
-      const userDataRef = database.ref().child("users/" + uid);
+  // firebase.auth().onAuthStateChanged((user) => {
+  //   if (user) {
+  //     const uid = user.uid;
+  //     const userDataRef = database.ref().child("users/" + uid);
 
-      userDataRef.on("value", (dataSnapshot) => {
-        let userData = dataSnapshot.val();
-        let userObj = {
-          uid: uid,
-          gold: userData.gold,
-          silver: userData.silver,
-          unopenedPacks: userData.unopenedPacks,
-        }
+  //     userDataRef.on("value", (dataSnapshot) => {
+  //       let userData = dataSnapshot.val();
+  //       let userObj = {
+  //         uid: uid,
+  //         gold: userData.gold,
+  //         silver: userData.silver,
+  //         unopenedPacks: userData.unopenedPacks,
+  //       }
 
-        callback(userObj)
-      });
-    } else {
-      callback('No user is signed in.');
-    }
-  });
+  //       callback(userObj)
+  //     });
+  //   } else {
+  //     callback('No user is signed in.');
+  //   }
+  // });
 }
 
 export function getUserCollection(callback) {

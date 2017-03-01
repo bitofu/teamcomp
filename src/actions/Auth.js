@@ -1,14 +1,14 @@
 import * as firebase from 'firebase';
 import { browserHistory } from 'react-router';
-import currentUser from '../stores/User';
+import userStore from '../stores/User';
 
 export function watchAuthData(nextState, replace) {
-  if (!currentUser.isAuth) {
+  if (!userStore.isAuth) {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         // User is signed in.
         // localStorage.setItem('currentUser', JSON.stringify(user));
-        currentUser.setUser(user);
+        userStore.setUser(user);
       } else {
         // No user is signed in.
         console.log('No user is signed in.');
@@ -21,7 +21,7 @@ export function watchAuthData(nextState, replace) {
 };
 
 export function watchAuthDataLanding(nextState, replace) {
-  if (!currentUser.isAuth) {
+  if (!userStore.isAuth) {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         // User is signed in.
@@ -34,7 +34,7 @@ export function watchAuthDataLanding(nextState, replace) {
 export function login(email, pw, cb) {
   firebase.auth().signInWithEmailAndPassword(email, pw)
   .then(user => {
-    currentUser.setUser(user);
+    userStore.setUser(user);
     cb(true);
   })
   .catch(error => {
@@ -46,7 +46,7 @@ export function logout() {
   firebase.auth().signOut().then(function() {
     // Sign-out successful.
     console.log('Sign-out successful');
-    currentUser.logout();
+    userStore.logout();
     browserHistory.replace({ pathname: '/login' });
     // localStorage.removeItem('currentUser');
   }, function(error) {
