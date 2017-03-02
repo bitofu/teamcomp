@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { logout } from '../actions/Auth';
-// import { getUserPacksAndCurrency } from '../actions/User';
 import { observer } from 'mobx-react';
 import userStore from '../stores/User';
 import Anchor from 'grommet/components/Anchor';
@@ -25,23 +24,6 @@ class AppHeader extends Component {
     };
     this._logout = this._logout.bind(this);
   }
-
-  // componentWillMount() {
-  //   getUserPacksAndCurrency((userData) => {
-  //     if (userData === 'No user is signed in.') {
-  //       this.setState({
-  //         isUserLoggedIn: false
-  //       });
-  //     } else {
-  //       this.setState({
-  //         isUserLoggedIn: true,
-  //         userGold: userData.gold,
-  //         userSilver: userData.silver,
-  //         unopenedPacks: userData.unopenedPacks
-  //       });
-  //     }
-  //   });
-  // }
 
   _logout(e) {
     e.stopPropagation();

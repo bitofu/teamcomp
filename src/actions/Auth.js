@@ -7,7 +7,6 @@ export function watchAuthData(nextState, replace) {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         // User is signed in.
-        // localStorage.setItem('currentUser', JSON.stringify(user));
         userStore.setUser(user);
       } else {
         // No user is signed in.
@@ -48,7 +47,6 @@ export function logout() {
     console.log('Sign-out successful');
     userStore.logout();
     browserHistory.replace({ pathname: '/login' });
-    // localStorage.removeItem('currentUser');
   }, function(error) {
     // An error happened.
     console.log('Error logging out');
