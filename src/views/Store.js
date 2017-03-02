@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { getUserPacksAndCurrency } from '../actions/User';
 import { getPackData, purchasePack } from '../actions/Packs';
+import { observer } from 'mobx-react';
+import userStore from '../stores/User';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Card from 'grommet/components/Card';
 import Box from 'grommet/components/Box';
 import Heading from 'grommet/components/Heading';
-import Headline from 'grommet/components/Headline';
 import Anchor from 'grommet/components/Anchor';
 import MoneyIcon from 'grommet/components/icons/base/Money';
 import Layer from 'grommet/components/Layer';
@@ -16,7 +16,9 @@ import Footer from 'grommet/components/Footer';
 import Button from 'grommet/components/Button';
 import FormFields from 'grommet/components/FormFields';
 import Paragraph from 'grommet/components/Paragraph';
+import NowLoading from './NowLoading';
 
+@observer
 class Store extends Component {
   constructor(props) {
     super(props);
@@ -25,8 +27,6 @@ class Store extends Component {
       packPrice: 0,
       packQuantity: 0,
       packData: [],
-      userGold: 0,
-      unopenedPacks: 0,
       currentUid: null,
       isViewReady: false
     };
@@ -34,13 +34,6 @@ class Store extends Component {
   }
 
   componentWillMount() {
-    getUserPacksAndCurrency((userData) => {
-      this.setState({
-        currentUid: userData.uid,
-        userGold: userData.gold,
-        unopenedPacks: userData.unopenedPacks
-      });
-    });
     getPackData((packData) => {
       this.setState({
         packData: packData,
@@ -64,8 +57,7 @@ class Store extends Component {
 
   purchasePack(e, packPrice, packQuantity) {
     e.stopPropagation();
-    const { userGold, unopenedPacks } = this.state;
-    purchasePack(userGold, unopenedPacks, packPrice, packQuantity);
+    purchasePack(userStore.gold, userStore.unopenedPacks, packPrice, packQuantity);
   }
 
   render() {
@@ -104,7 +96,7 @@ class Store extends Component {
       : null;
 
     // Move into smaller reusable component
-    const { isViewReady, packData, userGold } = this.state;
+    const { isViewReady, packData } = this.state;
     const listPacks = Object.keys(packData).map((key) =>
       <Tile key={key}>
         <Card thumbnail='https://firebasestorage.googleapis.com/v0/b/teamcomp-fecc4.appspot.com/o/packs%2Fleagueoflegends.jpg?alt=media'
@@ -115,8 +107,8 @@ class Store extends Component {
           heading={packData[key].quantity + ' Classic Pack'}
           label='League of Legends'
           link={
-            <Anchor disabled={ packData[key].price <= userGold ? false : true }
-                   onClick={ packData[key].price <= userGold ? this._onClickBuy.bind(this, packData[key].price, packData[key].quantity) : null }
+            <Anchor disabled={ packData[key].price <= userStore.gold ? false : true }
+                   onClick={ packData[key].price <= userStore.gold ? this._onClickBuy.bind(this, packData[key].price, packData[key].quantity) : null }
                    label={'Buy for ' + packData[key].price + 'g'}
                    icon={<MoneyIcon />} />
           }
@@ -137,12 +129,7 @@ class Store extends Component {
       );
     } else {
       return (
-        <Box justify="center" align="center" full={true}>
-          <Headline strong={false}
-            size='large'>
-            Loading...
-          </Headline>
-        </Box>
+        <NowLoading />
       );
     }
   }

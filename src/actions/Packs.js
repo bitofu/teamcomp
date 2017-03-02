@@ -1,6 +1,5 @@
 import database from '../database';
-
-const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+import userStore from '../stores/User';
 
 export function getPackData(callback) {
   let packDataRef = database.ref("packData");
@@ -19,8 +18,8 @@ export function purchasePack(userGold, unopenedPacks, packPrice, packQuantity) {
   // Update new user funds and add card packs to user collection
   var fbUpdate = {};
   // Replace with logged in user
-  fbUpdate['/users/' + currentUser.uid + '/gold'] = newUserGold;
-  fbUpdate['/users/' + currentUser.uid + '/unopenedPacks'] = newUnopenedPacks;
+  fbUpdate['/users/' + userStore.currentUser.uid + '/gold'] = newUserGold;
+  fbUpdate['/users/' + userStore.currentUser.uid + '/unopenedPacks'] = newUnopenedPacks;
   // save all to firebase
   database.ref().update(fbUpdate);
 }
@@ -54,7 +53,7 @@ function generateRanCards(array) {
 }
 
 function saveCardsToCollection(cardObjs, unopenedPacks) {
-  const currentUid = currentUser.uid;
+  const currentUid = userStore.currentUser.uid;
   return Promise.all(
     cardObjs.map(playerObj => {
       let playerKey = playerObj.playerKey;

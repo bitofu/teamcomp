@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Box from 'grommet/components/Box';
 import Heading from 'grommet/components/Heading';
 // import Hero from 'grommet/components/Hero';
-import RotationalLeagues from '../components/RotationalLeagues';
+// import RotationalLeagues from '../components/RotationalLeagues';
 import RegularLeagues from '../components/RegularLeagues';
 
 export default class Lobby extends Component {
