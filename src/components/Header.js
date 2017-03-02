@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { logout } from '../actions/Auth';
-import { getUserPacksAndCurrency } from '../actions/User';
+// import { getUserPacksAndCurrency } from '../actions/User';
 import { observer } from 'mobx-react';
 import userStore from '../stores/User';
 import Anchor from 'grommet/components/Anchor';
@@ -49,9 +49,7 @@ class AppHeader extends Component {
   }
 
   render() {
-    console.log('render twice?')
     if (userStore.isAuth) {
-      const { userGold, unopenedPacks } = this.state;
       return (
         <Header justify="center" colorIndex="grey-1">
           <Box direction="row"

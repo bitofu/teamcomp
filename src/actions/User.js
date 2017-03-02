@@ -1,6 +1,5 @@
 import database from '../database';
 import firebase from 'firebase';
-import userStore from '../stores/User';
 
 export function getUserPacksAndCurrency(callback) {
   // firebase.auth().onAuthStateChanged((user) => {
