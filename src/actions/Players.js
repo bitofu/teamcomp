@@ -1,4 +1,4 @@
-import database from './database';
+import database from '../database';
 
 export function getAllPlayerKeysAndRegions(callback) {
   const playerDataRef = database.ref("players");

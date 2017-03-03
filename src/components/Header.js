@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { logout } from '../actions/Auth';
-import { getUserPacksAndCurrency } from '../actions/User';
+import { observer } from 'mobx-react';
+import userStore from '../stores/User';
 import Anchor from 'grommet/components/Anchor';
 import Box from 'grommet/components/Box';
 import Header from 'grommet/components/Header';
@@ -11,6 +12,7 @@ import SettingsOptionIcon from 'grommet/components/icons/base/SettingsOption';
 import MultipleIcon from 'grommet/components/icons/base/Multiple';
 import NavAnchor from './NavAnchor';
 
+@observer
 class AppHeader extends Component {
   constructor(props) {
     super(props);
@@ -23,36 +25,16 @@ class AppHeader extends Component {
     this._logout = this._logout.bind(this);
   }
 
-  componentWillMount() {
-    getUserPacksAndCurrency((userData) => {
-      if (userData === 'No user is signed in.') {
-        this.setState({
-          isUserLoggedIn: false
-        });
-      } else {
-        this.setState({
-          isUserLoggedIn: true,
-          userGold: userData.gold,
-          userSilver: userData.silver,
-          unopenedPacks: userData.unopenedPacks
-        });
-      }
-    });
-  }
-
   _logout(e) {
     e.stopPropagation();
     logout();
   }
 
   render() {
-    const { isUserLoggedIn } = this.state;
-    if (isUserLoggedIn) {
-      const { userGold, unopenedPacks } = this.state;
+    if (userStore.isAuth) {
       return (
         <Header justify="center" colorIndex="grey-1">
-          <Box
-              direction="row"
+          <Box direction="row"
               responsive={false}
               justify="start"
               align="center"
@@ -73,7 +55,7 @@ class AppHeader extends Component {
               <Menu label="Profile" inline={true} direction="row" flex="grow">
                 <div>
                   <Anchor icon={<MultipleIcon />}
-                    label={"My Packs (" + unopenedPacks + ")"}
+                    label={"My Packs (" + userStore.unopenedPacks + ")"}
                     animateIcon={true}
                     primary={false}
                     reverse={false}
@@ -83,7 +65,7 @@ class AppHeader extends Component {
                 <div>
                   <Anchor icon={<MoneyIcon className="gold-icon" />}
                     className="gold-icon"
-                    label={userGold + " Gold"}
+                    label={userStore.gold + " Gold"}
                     animateIcon={true}
                     primary={false}
                     reverse={false}

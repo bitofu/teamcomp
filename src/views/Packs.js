@@ -1,31 +1,28 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
-import { getUserPacksAndCurrency } from '../actions/User';
 import { getAllPlayerKeysAndRegions } from '../actions/Players';
 import { openPack } from '../actions/Packs';
+import { observer } from 'mobx-react';
+import userStore from '../stores/User';
 import Box from 'grommet/components/Box';
 import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Card from 'grommet/components/Card';
 import Headline from 'grommet/components/Headline';
+// import NowLoading from './NowLoading';
 
+@observer
 class Packs extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      unopenedPacks: 0,
-      allPlayerKeysAndRegions: [],
-      currentUid: null
+    this.state = {  
+      isViewReady: false, // not sure how to use this yet but need to so that those with packs don't see 0 packs before load
+      listPacks: [],
+      allPlayerKeysAndRegions: []
     };
   }
 
   componentWillMount() {
-    getUserPacksAndCurrency((userData) => {
-      this.setState({
-        currentUid: userData.uid,
-        unopenedPacks: userData.unopenedPacks
-      });
-    });
     getAllPlayerKeysAndRegions((allPlayerKeysAndRegions) => {
       this.setState({
         allPlayerKeysAndRegions: allPlayerKeysAndRegions
@@ -47,9 +44,9 @@ class Packs extends Component {
   }
 
   render() {
-    const { unopenedPacks } = this.state;
+    // const { isViewReady } = this.state;
     const listPacks = [];
-    for(let i = 0; i < unopenedPacks; i++) {
+    for(let i = 0; i < userStore.unopenedPacks; i++) {
       listPacks.push(
         (
           <Tile key={i}
@@ -66,7 +63,7 @@ class Packs extends Component {
         )
       );
     }
-    if (unopenedPacks === 0) {
+    if (userStore.unopenedPacks === 0) {
       return (
         <Box justify="center" align="center" full={true}>
           <Headline strong={false}

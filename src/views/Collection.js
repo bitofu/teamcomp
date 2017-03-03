@@ -5,9 +5,9 @@ import Tile from 'grommet/components/Tile';
 import Box from 'grommet/components/Box';
 import List from 'grommet/components/List';
 import ListItem from 'grommet/components/ListItem';
-import Headline from 'grommet/components/Headline';
 import Select from 'grommet/components/Select';
 // import CircleInformationIcon from 'grommet/components/icons/base/CircleInformation';
+import NowLoading from './NowLoading';
 
 const playerImgPrefix ="https://firebasestorage.googleapis.com/v0/b/teamcomp-fecc4.appspot.com/o/players%2F";
 const playerImgSuffix =".png?alt=media";
@@ -183,15 +183,7 @@ class Collection extends Component {
       );
     } else {
       return (
-        <Box justify="center"
-             align="center"
-             full={true}
-             colorIndex="light-2">
-          <Headline strong={false}
-            size='large'>
-            Loading...
-          </Headline>
-        </Box>
+        <NowLoading />
       );
     }
   }

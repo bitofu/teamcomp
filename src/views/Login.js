@@ -8,12 +8,15 @@ import Box from 'grommet/components/Box';
 
 class Login extends Component {
   handleSubmit(fields) {
-    console.log(fields);
-    login(fields.username, fields.password).then( () => {
-      browserHistory.push('lobby');
+    login(fields.username, fields.password, authenticated => {
+      if (authenticated) {
+        browserHistory.push('lobby');
+      } else {
+        console.log('login failed');
+      };
     });
-  }
-
+  };
+  
   render () {
     return (
       <Box align='center' justify='center'>
