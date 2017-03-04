@@ -3,6 +3,7 @@ import { browserHistory } from 'react-router';
 import userStore from '../stores/User';
 
 export function watchAuthData(nextState, replace) {
+  // TODO: Do we still need to call firebase.auth().onAuthStateChanged if we already have the !userStore.isAuth condition?
   if (!userStore.isAuth) {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
@@ -11,15 +12,14 @@ export function watchAuthData(nextState, replace) {
       } else {
         // No user is signed in.
         console.log('No user is signed in.');
-        browserHistory.replace({
-          pathname: '/login'
-        });
+        browserHistory.replace({ pathname: '/login' });
       };
     });
   };
 };
 
 export function watchAuthDataLanding(nextState, replace) {
+  // TODO: Do we still need to call firebase.auth().onAuthStateChanged if we already have the !userStore.isAuth condition?
   if (!userStore.isAuth) {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {

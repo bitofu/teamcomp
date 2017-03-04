@@ -6,12 +6,14 @@ class UserStore {
   @observable gold;
   @observable silver;
   @observable unopenedPacks;
+  @observable dataReady;
 
   constructor() {
     this.currentUser = null;
     this.gold = 0;
     this.silver = 0;
     this.unopenedPacks = 0;
+    this.dataReady = false;
   };
 
   @computed get isAuth() {
@@ -27,9 +29,10 @@ class UserStore {
       this.gold = userData.gold;
       this.silver = userData.silver;
       this.unopenedPacks = userData.unopenedPacks;
+      this.dataReady = true;
     });
   };
-  
+
   @action logout() {
     this.currentUser = null;
     console.log('logging out', this.currentUser);

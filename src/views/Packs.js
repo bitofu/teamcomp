@@ -9,20 +9,20 @@ import Tiles from 'grommet/components/Tiles';
 import Tile from 'grommet/components/Tile';
 import Card from 'grommet/components/Card';
 import Headline from 'grommet/components/Headline';
-// import NowLoading from './NowLoading';
+import NowLoading from './NowLoading';
 
 @observer
 class Packs extends Component {
   constructor(props) {
     super(props);
-    this.state = {  
-      isViewReady: false, // not sure how to use this yet but need to so that those with packs don't see 0 packs before load
+    this.state = {
       listPacks: [],
       allPlayerKeysAndRegions: []
     };
   }
 
   componentWillMount() {
+    console.log(userStore.unopenedPacks);
     getAllPlayerKeysAndRegions((allPlayerKeysAndRegions) => {
       this.setState({
         allPlayerKeysAndRegions: allPlayerKeysAndRegions
@@ -38,13 +38,14 @@ class Packs extends Component {
     openPack(allPlayerKeysAndRegions, unopenedPacks, (cardData) => {
       console.log(cardData);
       // Using hack-y temp solution to save cardData into localstorage, so that the pack opening view can retrieve
+      // TODO: Store this in a store instead of localstorage
       localStorage.setItem('cardsInPack', JSON.stringify(cardData));
       browserHistory.push('/openpack/' + id);
     });
   }
 
   render() {
-    // const { isViewReady } = this.state;
+    // TODO: Move listPacks to a seperate render function
     const listPacks = [];
     for(let i = 0; i < userStore.unopenedPacks; i++) {
       listPacks.push(
@@ -63,24 +64,31 @@ class Packs extends Component {
         )
       );
     }
-    if (userStore.unopenedPacks === 0) {
-      return (
-        <Box justify="center" align="center" full={true}>
-          <Headline strong={false}
-            size='medium'>
-            You have no unopened packs
-          </Headline>
-        </Box>
-      );
+
+    if (userStore.dataReady) {
+      if (userStore.unopenedPacks === 0) {
+        return (
+          <Box justify="center" align="center" full={true}>
+            <Headline strong={false}
+              size='medium'>
+              You have no unopened packs
+            </Headline>
+          </Box>
+        );
+      } else {
+        return (
+          <Box full={true} colorIndex="light-2">
+            <Tiles selectable={false}
+              fill={true}
+              flush={false} >
+              { listPacks }
+            </Tiles>
+          </Box>
+        );
+      }
     } else {
       return (
-        <Box full={true} colorIndex="light-2">
-          <Tiles selectable={false}
-            fill={true}
-            flush={false} >
-            { listPacks }
-          </Tiles>
-        </Box>
+        <NowLoading />
       );
     }
   }
