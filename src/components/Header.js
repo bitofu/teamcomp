@@ -16,12 +16,7 @@ import NavAnchor from './NavAnchor';
 class AppHeader extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isUserLoggedIn: false,
-      userGold: 0,
-      userSilver: 0,
-      unopenedPacks: 0
-    };
+
     this._logout = this._logout.bind(this);
   }
 
@@ -55,7 +50,7 @@ class AppHeader extends Component {
               <Menu label="Profile" inline={true} direction="row" flex="grow">
                 <div>
                   <Anchor icon={<MultipleIcon />}
-                    label={"My Packs (" + userStore.unopenedPacks + ")"}
+                    label={ (userStore.dataReady) ? "My Packs (" + userStore.unopenedPacks + ")" : "My Packs" }
                     animateIcon={true}
                     primary={false}
                     reverse={false}
@@ -65,7 +60,7 @@ class AppHeader extends Component {
                 <div>
                   <Anchor icon={<MoneyIcon className="gold-icon" />}
                     className="gold-icon"
-                    label={userStore.gold + " Gold"}
+                    label={ (userStore.dataReady) ? userStore.gold + " Gold" : "Gold"}
                     animateIcon={true}
                     primary={false}
                     reverse={false}
